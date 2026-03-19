@@ -1,0 +1,81 @@
+# Theme: Vesper + Mellow (bdsqqq style)
+# Source: https://bedes.qui.gg/writing/macos-rice
+
+# Main bg
+theme[main_bg]="#101010"
+
+# Main text color
+theme[main_fg]="#ffffff"
+
+# Title color for boxes
+theme[title]="#FFC799"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="#FFC799"
+
+# Background color of selected item in processes box
+theme[selected_bg]="#282828"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="#ffffff"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#57575f"
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]="#90b99f"
+
+# Cpu box outline color
+theme[cpu_box]="#7E7E7E"
+
+# Memory/disks box outline color
+theme[mem_box]="#7E7E7E"
+
+# Net up/down box outline color
+theme[net_box]="#7E7E7E"
+
+# Processes box outline color
+theme[proc_box]="#7E7E7E"
+
+# Box divider line and small boxes line color
+theme[div_line]="#57575f"
+
+# Temperature graph colors
+theme[temp_start]="#90b99f"
+theme[temp_mid]="#e6b99d"
+theme[temp_end]="#f5a191"
+
+# CPU graph colors
+theme[cpu_start]="#aca1cf"
+theme[cpu_mid]="#e29eca"
+theme[cpu_end]="#f5a191"
+
+# Mem/Disk free meter
+theme[free_start]="#90b99f"
+theme[free_mid]="#e6b99d"
+theme[free_end]="#FFC799"
+
+# Mem/Disk cached meter
+theme[cached_start]="#aca1cf"
+theme[cached_mid]="#b9aeda"
+theme[cached_end]="#ecaad6"
+
+# Mem/Disk available meter
+theme[available_start]="#90b99f"
+theme[available_mid]="#99FFE4"
+theme[available_end]="#FFC799"
+
+# Mem/Disk used meter
+theme[used_start]="#e6b99d"
+theme[used_mid]="#f5a191"
+theme[used_end]="#ff8080"
+
+# Download graph colors
+theme[download_start]="#90b99f"
+theme[download_mid]="#e6b99d"
+theme[download_end]="#FFC799"
+
+# Upload graph colors
+theme[upload_start]="#ea83a5"
+theme[upload_mid]="#e29eca"
+theme[upload_end]="#f5a191"

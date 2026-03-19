@@ -1,0 +1,16 @@
+@define-color foreground #ffffff;
+@define-color background #101010;
+
+@define-color panel #1C1C1C;
+@define-color chip #282828;
+@define-color chip_dark #101010;
+@define-color hover #57575f;
+
+@define-color ws_active #FFC799;
+@define-color ws_active_text #101010;
+@define-color ws_text #A0A0A0;
+
+@define-color volume #FFC799;
+@define-color net #f5a191;
+@define-color battery_bg #90b99f;
+@define-color battery_fg #101010;

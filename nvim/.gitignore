@@ -1,0 +1,18 @@
+# Lock files (auto-generated)
+nvim-pack-lock.json
+
+# Windows special files
+nul
+
+# Plugin directories (managed by package manager)
+pack/
+
+# Session files
+Session.vim
+
+# Undo files
+undo/
+
+# Swap files
+*.swp
+*.swo
