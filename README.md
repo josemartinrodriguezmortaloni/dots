@@ -7,6 +7,7 @@ Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and mode
 | Config | Description |
 |--------|-------------|
 | **nvim** | Neovim 0.11+ with vesper.nvim, blink.cmp, mini.nvim, treesitter, diffview |
+| **doom** | Doom Emacs — init.el, config.el, packages.el con org-roam, magit, LSP |
 | **ghostty** | Ghostty terminal with Vesper colors, JetBrainsMono Nerd Font |
 | **hypr** | Hyprland compositor — keybindings, animations, dual monitor, NVIDIA |
 | **waybar** | Status bar with custom window pill, workspace indicators |
@@ -51,7 +52,7 @@ The installer creates symlinks from this repo to `~/.config/` and `~/`. Existing
 - **WM**: Hyprland (Wayland)
 - **Terminal**: Ghostty
 - **Shell**: Zsh + Zinit + oh-my-posh
-- **Editor**: Neovim 0.11+
+- **Editor**: Neovim 0.11+ / Doom Emacs
 - **Font**: JetBrainsMono Nerd Font
 - **GPU**: NVIDIA
 - **Monitors**: Ultrawide 3440x1440 + 1080p

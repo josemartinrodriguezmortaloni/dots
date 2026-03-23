@@ -115,6 +115,12 @@ backup_and_link "$DOTS/zsh/.zshenv" "$HOME/.zshenv"
 info "oh-my-posh"
 backup_and_link "$DOTS/ohmyposh/star.omp.json" "$HOME/.config/ohmyposh/star.omp.json"
 
+# Doom Emacs
+info "doom emacs"
+backup_and_link "$DOTS/doom/init.el" "$HOME/.config/doom/init.el"
+backup_and_link "$DOTS/doom/config.el" "$HOME/.config/doom/config.el"
+backup_and_link "$DOTS/doom/packages.el" "$HOME/.config/doom/packages.el"
+
 # Vesper theme (Omarchy)
 info "vesper theme"
 link_dir "$DOTS/vesper" "$HOME/.config/omarchy/themes/vesper"
@@ -140,6 +146,10 @@ fi
 if command -v omarchy-restart-waybar &>/dev/null; then
 	info "restarting waybar..."
 	omarchy-restart-waybar &>/dev/null && ok "waybar restarted"
+fi
+
+if command -v doom &>/dev/null; then
+	info "run 'doom sync' to apply emacs package changes."
 fi
 
 echo ""
