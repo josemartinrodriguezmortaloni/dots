@@ -66,3 +66,7 @@
 (package! org-gcal)
 (package! git-auto-commit-mode)
 (package! org-modern)
+(package! toc-org)
+(package! tldr)
+(package! nov)
+(package! djvu)

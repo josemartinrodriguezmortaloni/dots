@@ -20,9 +20,21 @@
 ;;
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
-;;
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 16 )
-      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font Mono" :size 13))
+(setq doom-font (font-spec :family "iAWriterQuattroV" :size 16)
+      doom-variable-pitch-font (font-spec :family "iAWriterQuattroV" :size 18)
+      doom-big-font (font-spec :family "iAWriterQuattroV" :size 22)
+      doom-symbol-font (font-spec :family "GeistMono Nerd Font" :size 16))
+
+(defun my/setup-nerd-font-fallback ()
+  "Map Nerd Font PUA ranges to GeistMono Nerd Font."
+  (let ((nerd-font (font-spec :family "GeistMono Nerd Font")))
+    (set-fontset-font t '(#xe000 . #xf8ff) nerd-font)
+    (set-fontset-font t '(#xf0001 . #xf1af0) nerd-font)
+    (set-fontset-font t '(#xea60 . #xebe9) nerd-font)
+    (set-fontset-font t '(#xe0a0 . #xe0d4) nerd-font)))
+
+(add-hook 'after-setting-font-hook #'my/setup-nerd-font-fallback)
+
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
@@ -35,19 +47,71 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type 'relative)
 
+;; ORG
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "/home/m4s1t4/Documents/Notes/OrgNotes/")
 (setq org-roam-directory (file-truename "/home/m4s1t4/Documents/Notes/OrgNotes/roam/"))
-
+(setq org-modern-table-vertical 1)
+(setq org-modern-table t)
+(add-hook 'org-mode-hook #'hl-todo-mode)
+(add-hook 'org-mode-hook #'org-indent-mode)
+(after! diminish
+  (diminish 'org-indent-mode))
 (setq org-roam-file-extensions '("org"))
 (setq org-roam-node-display-template
       (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
+;; ============================================================================
+;; FACULTAD CAPTURE — Helpers para template interactivo
+;; ============================================================================
+
+(defvar my/fac-año nil "Año de cursado seleccionado durante capture.")
+(defvar my/fac-materia nil "Materia seleccionada durante capture.")
+(defvar my/fac-tipo nil "Tipo (teoría/práctica) seleccionado durante capture.")
+(defvar my/fac-unidad nil "Unidad/TP seleccionado durante capture.")
+
+(defun my/fac-slugify (str)
+  "Convierte STR a slug: minúsculas, espacios→guiones."
+  (downcase (string-replace " " "-" str)))
+
+(defun my/fac-list-subdirs (dir)
+  "Lista subcarpetas directas de DIR, excluyendo dotfiles."
+  (when (file-directory-p dir)
+    (cl-remove-if
+     (lambda (f) (string-prefix-p "." f))
+     (directory-files dir nil directory-files-no-dot-files-regexp))))
+
+(defun my/fac-capture-dir ()
+  "Promptea año, materia, tipo y unidad. Retorna el directorio relativo (con / final)."
+  (setq my/fac-año (completing-read "Año: " '("primero" "segundo" "tercero" "cuarto") nil t))
+  (let* ((materias-dir (expand-file-name (concat "facultad/" my/fac-año) org-roam-directory)))
+    (setq my/fac-materia (completing-read "Materia: " (my/fac-list-subdirs materias-dir))))
+  (setq my/fac-tipo (completing-read "Tipo: " '("teoría" "práctica") nil t))
+  (let* ((tipo-dir (expand-file-name
+                    (format "facultad/%s/%s/%s"
+                            my/fac-año (my/fac-slugify my/fac-materia) my/fac-tipo)
+                    org-roam-directory))
+         (existing (my/fac-list-subdirs tipo-dir))
+         (prompt (if (string= my/fac-tipo "teoría") "Unidad: " "TP: ")))
+    (setq my/fac-unidad (completing-read prompt (or existing '()) nil nil)))
+  (format "facultad/%s/%s/%s/%s/"
+          my/fac-año
+          (my/fac-slugify my/fac-materia)
+          my/fac-tipo
+          my/fac-unidad))
+
+(defun my/fac-tags ()
+  "Retorna el string de filetags para la captura de facultad actual."
+  (format ":facultad:%s:%s:%s:"
+          (my/fac-slugify my/fac-materia)
+          my/fac-tipo
+          (my/fac-slugify my/fac-unidad)))
+
 (setq org-roam-capture-templates
-      '(;; General
+      `(;; General
         ("d" "default" plain "%?"
          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                             "#+title: ${title}\n#+filetags: \n")
@@ -58,11 +122,12 @@
          :immediate-finish t
          :unnarrowed t)
 
-        ;; Facultad
+        ;; Facultad — promptea año, materia, tipo y unidad interactivamente
         ("f" "facultad" plain
          "* Contenido\n%?\n\n* Preguntas\n- [ ] \n\n* Conexiones\n"
-         :if-new (file+head "facultad/${slug}.org"
-                            "#+title: ${title}\n#+filetags: :facultad:\n#+date: %U\n")
+         :if-new (file+head
+                  "%(my/fac-capture-dir)${slug}.org"
+                  "#+title: ${title}\n#+filetags: %(my/fac-tags)\n#+date: %U\n")
          :unnarrowed t)
 
         ;; Lectura — Notas de capítulo
@@ -106,33 +171,14 @@
                             "#+title: ${title}\n#+filetags: :article:\n")
          :immediate-finish t
          :unnarrowed t)
+        ))
 
-        ;; Japonés
-        ("g" "Genki" plain "%?"
-         :if-new (file+head "reference/Genki/${slug}.org"
-                            "#+title: ${title}\n#+date: %U\n")
-         :unnarrowed t)
-        ("k" "Tae Kim" plain "%?"
-         :if-new (file+head "reference/TaeKim/${slug}.org"
-                            "#+title: ${title}\n#+date: %U\n")
-         :unnarrowed t)))
-
-(use-package org-roam
-  :ensure t
+(use-package! org-roam
   :custom
   (org-roam-directory (file-truename "/home/m4s1t4/Documents/Notes/OrgNotes/roam/"))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today))
   :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
   (require 'org-roam-protocol))
 
 (use-package! org-roam-ui
@@ -144,16 +190,66 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
-(use-package vterm
-  :ensure t
-  :commands vterm)
-
 ;; KEYMAPS
 (map! :leader
       :desc "Comment Line" "-" #'comment-line)
 
 (map! :leader
-      :desc "Open Neotree" "e" #'treemacs)
+      (:prefix ("t" . "toggle")
+       :desc "Toggle eshell split"            "e" #'eshell
+       :desc "Toggle line highlight in frame" "h" #'hl-line-mode
+       :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
+       :desc "Toggle line numbers"            "l" #'doom/toggle-line-numbers
+       :desc "Toggle markdown-view-mode"      "m" #'dt/toggle-markdown-view-mode
+       :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines
+       :desc "Toggle treemacs"                "T" #'treemacs))
+
+(map! :leader
+      (:prefix ("o" . "open")
+       :desc "Open eshell here"    "e" #'eshell
+       :desc "Journal"             "j" (lambda () (interactive)
+                                         (find-file (concat org-directory "journal.org")))
+       :desc "Notes"               "n" (lambda () (interactive)
+                                         (find-file (concat org-directory "notes.org")))
+       :desc "Tasks"               "t" (lambda () (interactive)
+                                         (find-file (concat org-directory "tasks.org")))))
+
+;; Org leader bindings
+(map! :leader
+      (:prefix ("m" . "org/local")
+       :desc "Org agenda"        "a" #'org-agenda
+       :desc "Org capture"       "c" #'org-capture
+       :desc "Org export"        "e" #'org-export-dispatch
+       :desc "Org toggle item"   "i" #'org-toggle-item
+       :desc "Org babel tangle"  "B" #'org-babel-tangle
+       :desc "Org todo"          "T" #'org-todo
+       :desc "Org time stamp"    "d" #'org-time-stamp))
+
+;; Search bindings
+(map! :leader
+      (:prefix ("s" . "search")
+       :desc "Dictionary search"  "d" #'dictionary-search
+       :desc "TLDR docs"          "T" #'tldr
+       :desc "PDF occur"          "o" #'pdf-occur))
+
+;; Org-roam shortcuts — SPC n directo (sin pasar por r)
+(map! :leader
+      (:prefix ("n" . "notes")
+       :desc "Find node"          "f" #'org-roam-node-find
+       :desc "Insert link"        "i" #'org-roam-node-insert
+       :desc "Capture"            "c" #'org-roam-capture
+       :desc "Dailies today"      "j" #'org-roam-dailies-capture-today
+       :desc "Toggle roam buffer" "l" #'org-roam-buffer-toggle
+       :desc "Roam graph"         "g" #'org-roam-graph
+       :desc "Roam UI"            "u" #'org-roam-ui-open))
+
+;; Quick config access
+(map! :leader
+      (:prefix ("f" . "file")
+       :desc "Open doom config"   "c" (lambda () (interactive)
+                                        (find-file (concat doom-user-dir "config.el")))
+       :desc "Open doom dir"      "C" (lambda () (interactive)
+                                        (dired doom-user-dir))))
 
 
 
@@ -186,6 +282,16 @@
 ;; etc).
 ;;
 (setq confirm-kill-emacs nil)
+(setq ispell-dictionary "es_AR")
+
+;; ============================================================================
+;; TEXT SCALING — Zoom global con C-= / C-- y mouse wheel
+;; ============================================================================
+
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
 ;; ============================================================================
 ;; ORG-MODE: Agenda, Habit, y configuración general
@@ -204,7 +310,13 @@
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
   (setq org-habit-graph-column 60
-        org-habit-show-all-today t))
+        org-habit-show-all-today t)
+
+  ;; org-tempo — < s TAB expande a #+begin_src, etc.
+  (require 'org-tempo)
+
+  ;; Preservar indentación al tanglear con org-babel
+  (setq org-src-preserve-indentation t))
 
 ;; ============================================================================
 ;; ORG-SUPER-AGENDA — Agenda agrupada por categorías
@@ -258,6 +370,21 @@
   (setq org-noter-notes-search-path (list org-roam-directory)
         org-noter-auto-save-last-location t
         org-noter-separate-notes-from-heading t))
+
+;; ============================================================================
+;; PDF-TOOLS — Evil keybindings + display limpio
+;; ============================================================================
+
+(after! pdf-tools
+  (add-hook 'pdf-view-mode-hook
+            (lambda ()
+              (display-line-numbers-mode -1)
+              (blink-cursor-mode -1)))
+  (map! :map pdf-view-mode-map
+        :n "j" #'pdf-view-next-line-or-next-page
+        :n "k" #'pdf-view-previous-line-or-previous-page
+        :n "C-=" #'pdf-view-enlarge
+        :n "C--" #'pdf-view-shrink))
 
 ;; ============================================================================
 ;; ORG-POMODORO — Timer Pomodoro + time tracking
@@ -336,4 +463,31 @@
                                         (expand-file-name buffer-file-name)))
               (git-auto-commit-mode 1))))
 (use-package! org-modern
-  :hook (org-mode . org-modern-mode))
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-star '("◉" "○" "✸" "✿" "✿")))
+
+;; ============================================================================
+;; TOC-ORG — Table of Contents automática en archivos Org
+;; ============================================================================
+
+(use-package! toc-org
+  :hook (org-mode . toc-org-enable))
+
+;; MARKDOWN
+(custom-set-faces
+ '(markdown-header-face ((t (:inherit font-lock-function-name-face :weight bold :family "variable-pitch"))))
+ '(markdown-header-face-1 ((t (:inherit markdown-header-face :height 1.6))))
+ '(markdown-header-face-2 ((t (:inherit markdown-header-face :height 1.5))))
+ '(markdown-header-face-3 ((t (:inherit markdown-header-face :height 1.4))))
+ '(markdown-header-face-4 ((t (:inherit markdown-header-face :height 1.3))))
+ '(markdown-header-face-5 ((t (:inherit markdown-header-face :height 1.2))))
+ '(markdown-header-face-6 ((t (:inherit markdown-header-face :height 1.1)))))
+
+;; Toggle Markdown View
+(defun dt/toggle-markdown-view-mode ()
+  "Toggle between `markdown-mode' and `markdown-view-mode'."
+  (interactive)
+  (if (eq major-mode 'markdown-view-mode)
+      (markdown-mode)
+    (markdown-view-mode)))

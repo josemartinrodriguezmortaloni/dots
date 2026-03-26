@@ -52,7 +52,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Manual configuration
-PATH=$HOME/.local/bin:/root/.local/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin
+PATH=$HOME/.local/bin:/root/.local/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/.emacs.d/bin:$PATH
 
 # Oh-my-posh configuration
 eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/star.omp.json)"
@@ -66,10 +66,12 @@ alias ls='lsd --group-dirs=first'
 alias cat='bat'
 alias t='tmux'
 alias ep='cd /run/media/m4s1t4/5CBE1E5BBE1E2DD0/Mis_Docs/Enprendimiento/Proyectos'
+alias ob='/run/media/m4s1t4/5CBE1E5BBE1E2DD0/Mis_Docs/EstudioProductividad/Obsidia-Vault/Jose/'
 alias f='cd /home/m4s1t4/Documents/Facultad'
 alias fc='cd /home/m4s1t4/Documents/Facultad/Cuarto/'
 alias ft='cd /home/m4s1t4/Documents/Facultad/Tercero/'
 alias fs='cd /home/m4s1t4/Documents/Facultad/Segundo/'
+em() { setsid emacs "${@:-.}" &>/dev/null & }
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 ### Added by Zinit's installer

@@ -13,6 +13,8 @@ vim.pack.add({
   { src = "https://github.com/sindrets/diffview.nvim" },
   { src = "https://github.com/nvim-tree/nvim-tree.lua" },
   { src = "https://github.com/datsfilipe/vesper.nvim" },
+  { src = "https://github.com/tjdevries/colorbuddy.nvim" },
+  { src = "https://github.com/2nthony/vitesse.nvim.git" },
 })
 
 require("plugins.editor")
