@@ -52,7 +52,6 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
-(package! solarized-theme)
 (package! org-roam-ui
   :recipe (:host github :repo "org-roam/org-roam-ui"))
 (package! vterm)
@@ -70,3 +69,10 @@
 (package! tldr)
 (package! nov)
 (package! djvu)
+
+;; === Python Development ===
+(package! python-pytest)
+(package! numpydoc)
+
+;; === Window Management ===
+(package! ace-window)

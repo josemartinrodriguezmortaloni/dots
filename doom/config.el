@@ -43,7 +43,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-gruvbox-light)
+(setq doom-theme 'doom-gruvbox)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -196,23 +196,11 @@
 
 (map! :leader
       (:prefix ("t" . "toggle")
-       :desc "Toggle eshell split"            "e" #'eshell
-       :desc "Toggle line highlight in frame" "h" #'hl-line-mode
-       :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
-       :desc "Toggle line numbers"            "l" #'doom/toggle-line-numbers
-       :desc "Toggle markdown-view-mode"      "m" #'dt/toggle-markdown-view-mode
-       :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines
-       :desc "Toggle treemacs"                "T" #'treemacs))
-
-(map! :leader
-      (:prefix ("o" . "open")
-       :desc "Open eshell here"    "e" #'eshell
-       :desc "Journal"             "j" (lambda () (interactive)
-                                         (find-file (concat org-directory "journal.org")))
-       :desc "Notes"               "n" (lambda () (interactive)
-                                         (find-file (concat org-directory "notes.org")))
-       :desc "Tasks"               "t" (lambda () (interactive)
-                                         (find-file (concat org-directory "tasks.org")))))
+       :desc "Toggle vterm"         "v" #'+vterm/toggle
+       :desc "Toggle zen mode"      "z" #'+zen/toggle
+       :desc "Toggle line numbers"  "l" #'doom/toggle-line-numbers
+       :desc "Toggle markdown view" "m" #'dt/toggle-markdown-view-mode
+       :desc "Toggle treemacs"      "T" #'treemacs))
 
 ;; Org leader bindings
 (map! :leader
@@ -491,3 +479,67 @@
   (if (eq major-mode 'markdown-view-mode)
       (markdown-mode)
     (markdown-view-mode)))
+
+;; ============================
+;; Window & Buffer Navigation
+;; ============================
+
+;; ace-window: selección visual de ventana por letra (home row)
+(after! ace-window
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+        aw-scope 'frame))
+
+;; Splits rápidos — SPC | vertical, SPC \ horizontal
+;; SPC w h/j/k/l ya navega entre ventanas (Doom default)
+;; SPC ,         ya cambia buffer en el workspace (Doom default)
+(map! :leader
+      :desc "Split vertical"   "|"   #'evil-window-vsplit
+      :desc "Split horizontal" "\\"  #'evil-window-split
+      :desc "Ace window jump"  "w w" #'ace-window)
+
+;; ============================
+;; Python Development
+;; ============================
+
+(after! python
+  (setq python-shell-interpreter "python3"))
+
+;; LSP Pyright — detecta .venv creado por uv en la raíz del proyecto
+(after! lsp-pyright
+  (setq lsp-pyright-auto-import-completions t
+        lsp-pyright-diagnostic-mode "workspace"
+        lsp-pyright-typechecking-mode "basic"
+        lsp-pyright-venv-path ".venv"))
+
+;; Formatter: ruff via apheleia (reemplaza black + isort)
+(after! apheleia
+  (setf (alist-get 'python-mode apheleia-mode-alist) 'ruff)
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) 'ruff))
+
+;; Linter: ruff via flycheck
+(after! flycheck
+  (setq flycheck-python-ruff-executable "ruff"))
+
+;; Debugger: dap-mode con debugpy
+(after! dap-mode
+  (require 'dap-python)
+  (setq dap-python-debugger 'debugpy)
+  (dap-register-debug-template
+   "Python :: Run File"
+   (list :type "python"
+         :args ""
+         :cwd nil
+         :program nil
+         :request "launch"
+         :name "Python :: Run File")))
+
+;; Testing con pytest
+(after! python-pytest
+  (setq python-pytest-arguments '("--color" "--tb=short")))
+
+(map! :localleader
+      :map python-mode-map
+      "t t" #'python-pytest-function
+      "t f" #'python-pytest-file
+      "t r" #'python-pytest-last-failed
+      "t a" #'python-pytest-dispatch)
