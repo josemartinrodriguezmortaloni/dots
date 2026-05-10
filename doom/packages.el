@@ -54,7 +54,6 @@
 ;; (unpin! t)
 (package! org-roam-ui
   :recipe (:host github :repo "org-roam/org-roam-ui"))
-(package! vterm)
 
 ;; Org productivity & PKM
 (package! org-super-agenda)

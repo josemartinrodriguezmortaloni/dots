@@ -373,7 +373,7 @@
         :n "k" #'pdf-view-previous-line-or-previous-page
         :n "C-=" #'pdf-view-enlarge
         :n "C--" #'pdf-view-shrink))
-
+(setq org-latex-compiler lualatex)
 ;; ============================================================================
 ;; ORG-POMODORO — Timer Pomodoro + time tracking
 ;; ============================================================================
