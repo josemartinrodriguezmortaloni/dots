@@ -111,11 +111,7 @@ install_hypr() {
     done
 }
 
-install_waybar() {
-    _link "$DOTS/waybar/config.jsonc"   "$HOME/.config/waybar/config.jsonc"
-    _link "$DOTS/waybar/style.css"      "$HOME/.config/waybar/style.css"
-    _link "$DOTS/waybar/window_pill.py" "$HOME/.config/waybar/window_pill.py"
-}
+install_waybar() { _link "$DOTS/waybar/.config/waybar" "$HOME/.config/waybar"; }
 
 install_walker()   { _link "$DOTS/walker/config.toml"     "$HOME/.config/walker/config.toml"; }
 install_tmux()     { _link "$DOTS/tmux/tmux.conf"         "$HOME/.config/tmux/tmux.conf"; }
