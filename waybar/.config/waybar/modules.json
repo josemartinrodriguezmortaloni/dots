@@ -111,7 +111,7 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "ghostty --class=local.wlctl -e wlctl"
+    "on-click": "omarchy-launch-wifi"
   },
   "custom/filemanager": {
     "format": "",
