@@ -9,6 +9,7 @@ Thumbs.db
 # Neovim generated
 nvim/nvim-pack-lock.json
 nvim/plugin/
+nvim/*.log
 
 # Binaries
 *.png
