@@ -120,8 +120,20 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 vim.api.nvim_create_autocmd("FileType", {
 	group = aug("web-indent"),
-	pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact",
-		"json", "jsonc", "html", "css", "scss", "yaml", "lua", "toml" },
+	pattern = {
+		"javascript",
+		"typescript",
+		"javascriptreact",
+		"typescriptreact",
+		"json",
+		"jsonc",
+		"html",
+		"css",
+		"scss",
+		"yaml",
+		"lua",
+		"toml",
+	},
 	callback = function()
 		vim.bo.tabstop, vim.bo.shiftwidth, vim.bo.softtabstop = 2, 2, 2
 	end,
@@ -137,6 +149,8 @@ vim.pack.add({
 	"https://github.com/NvChad/nvterm",
 	"https://github.com/stevearc/conform.nvim",
 	"https://github.com/nvim-mini/mini.nvim",
+	"https://github.com/OXY2DEV/markview.nvim",
+	"https://github.com/sindrets/diffview.nvim.git",
 })
 -- El plugin del colorscheme NO se declara acá: lo instala de forma perezosa la
 -- integración con Omarchy (sección 8), solo el del tema activo.
@@ -159,9 +173,26 @@ end, { desc = "Git: toggle overlay" })
 
 -- Treesitter (rama main)
 require("nvim-treesitter").install({
-	"python", "typescript", "tsx", "javascript", "rust", "lua", "vim", "vimdoc",
-	"query", "json", "toml", "yaml", "markdown", "markdown_inline", "bash",
-	"html", "css", "sql", "dockerfile", "regex",
+	"python",
+	"typescript",
+	"tsx",
+	"javascript",
+	"rust",
+	"lua",
+	"vim",
+	"vimdoc",
+	"query",
+	"json",
+	"toml",
+	"yaml",
+	"markdown",
+	"markdown_inline",
+	"bash",
+	"html",
+	"css",
+	"sql",
+	"dockerfile",
+	"regex",
 })
 vim.treesitter.language.register("json", "jsonc")
 
@@ -177,19 +208,19 @@ vim.api.nvim_create_autocmd("FileType", {
 -- fzf-lua
 require("fzf-lua").setup({ "default-title" })
 for _, m in ipairs({
-	{ "ff", "files",                       "Archivos" },
-	{ "fg", "git_files",                   "Archivos git" },
-	{ "fb", "buffers",                     "Buffers" },
-	{ "fr", "oldfiles",                    "Recientes" },
-	{ "fs", "live_grep",                   "Buscar texto" },
-	{ "fw", "grep_cword",                  "Palabra bajo cursor" },
-	{ "fc", "commands",                    "Comandos" },
-	{ "fk", "keymaps",                     "Keymaps" },
-	{ "fh", "helptags",                    "Ayuda" },
-	{ "fd", "diagnostics_document",        "Diag (buffer)" },
-	{ "fD", "diagnostics_workspace",       "Diag (workspace)" },
-	{ "fS", "lsp_live_workspace_symbols",  "Símbolos" },
-	{ "f.", "resume",                      "Reabrir picker" },
+	{ "ff", "files", "Archivos" },
+	{ "fg", "git_files", "Archivos git" },
+	{ "fb", "buffers", "Buffers" },
+	{ "fr", "oldfiles", "Recientes" },
+	{ "fs", "live_grep", "Buscar texto" },
+	{ "fw", "grep_cword", "Palabra bajo cursor" },
+	{ "fc", "commands", "Comandos" },
+	{ "fk", "keymaps", "Keymaps" },
+	{ "fh", "helptags", "Ayuda" },
+	{ "fd", "diagnostics_document", "Diag (buffer)" },
+	{ "fD", "diagnostics_workspace", "Diag (workspace)" },
+	{ "fS", "lsp_live_workspace_symbols", "Símbolos" },
+	{ "f.", "resume", "Reabrir picker" },
 }) do
 	map("n", "<leader>" .. m[1], "<cmd>FzfLua " .. m[2] .. "<CR>", { desc = m[3] })
 end
@@ -206,10 +237,18 @@ require("nvterm").setup({
 })
 do
 	local term = require("nvterm.terminal")
-	map({ "n", "t" }, "<A-i>", function() term.toggle("float") end, { desc = "Terminal flotante" })
-	map({ "n", "t" }, "<A-h>", function() term.toggle("horizontal") end, { desc = "Terminal horizontal" })
-	map({ "n", "t" }, "<A-v>", function() term.toggle("vertical") end, { desc = "Terminal vertical" })
-	map("n", "<leader>tn", function() term.new("horizontal") end, { desc = "Nueva terminal" })
+	map({ "n", "t" }, "<A-i>", function()
+		term.toggle("float")
+	end, { desc = "Terminal flotante" })
+	map({ "n", "t" }, "<A-h>", function()
+		term.toggle("horizontal")
+	end, { desc = "Terminal horizontal" })
+	map({ "n", "t" }, "<A-v>", function()
+		term.toggle("vertical")
+	end, { desc = "Terminal vertical" })
+	map("n", "<leader>tn", function()
+		term.new("horizontal")
+	end, { desc = "Nueva terminal" })
 end
 
 -- conform.nvim
@@ -236,7 +275,9 @@ require("conform").setup({
 vim.api.nvim_create_autocmd("InsertLeave", {
 	group = aug("autoformat-insert-leave"),
 	callback = function()
-		if vim.b.disable_autoformat or vim.g.disable_autoformat then return end
+		if vim.b.disable_autoformat or vim.g.disable_autoformat then
+			return
+		end
 		require("conform").format({ async = true, lsp_format = "fallback" })
 	end,
 })
@@ -246,7 +287,9 @@ local function paste_then_format(key)
 		local reg = vim.v.register
 		local count = vim.v.count1
 		vim.cmd(('normal! "%s%d%s'):format(reg, count, key))
-		if vim.b.disable_autoformat or vim.g.disable_autoformat then return end
+		if vim.b.disable_autoformat or vim.g.disable_autoformat then
+			return
+		end
 		vim.schedule(function()
 			require("conform").format({ async = true, lsp_format = "fallback" })
 		end)
@@ -255,7 +298,9 @@ end
 map("n", "p", paste_then_format("p"), { desc = "Pegar + formatear" })
 map("n", "P", paste_then_format("P"), { desc = "Pegar encima + formatear" })
 
-map("n", "<leader>lF", function() require("conform").format({ async = true }) end, { desc = "Formatear" })
+map("n", "<leader>lF", function()
+	require("conform").format({ async = true })
+end, { desc = "Formatear" })
 map("n", "<leader>lT", function()
 	vim.b.disable_autoformat = not vim.b.disable_autoformat
 	vim.notify("Autoformat " .. (vim.b.disable_autoformat and "OFF" or "ON") .. " (buffer)")
@@ -361,9 +406,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	group = aug("lsp-attach"),
 	callback = function(ev)
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
-		if not client then return end
+		if not client then
+			return
+		end
 		local b = ev.buf
-		local kopt = function(desc) return { buffer = b, desc = desc } end
+		local kopt = function(desc)
+			return { buffer = b, desc = desc }
+		end
 
 		if client:supports_method("textDocument/completion") then
 			vim.lsp.completion.enable(true, client.id, b, { autotrigger = true })
@@ -378,7 +427,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
 				group = g,
 				buffer = b,
-				callback = function() vim.lsp.codelens.refresh({ bufnr = b }) end,
+				callback = function()
+					vim.lsp.codelens.refresh({ bufnr = b })
+				end,
 			})
 			vim.lsp.codelens.refresh({ bufnr = b })
 		end
@@ -386,7 +437,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		-- Defaults 0.12 ya provistos: gd, K, grn, gra, grr, gri, grt, grx, <C-s>
 		map({ "n", "v" }, "<leader>la", vim.lsp.buf.code_action, kopt("LSP: code action"))
 		map("n", "<leader>lr", vim.lsp.buf.rename, kopt("LSP: rename"))
-		map("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, kopt("LSP: format"))
+		map("n", "<leader>lf", function()
+			vim.lsp.buf.format({ async = true })
+		end, kopt("LSP: format"))
 		map("n", "<leader>ls", vim.lsp.buf.document_symbol, kopt("LSP: símbolos"))
 		map("n", "<leader>lt", vim.lsp.buf.type_definition, kopt("LSP: type def"))
 		map("n", "<leader>lD", vim.lsp.buf.declaration, kopt("LSP: declaración"))
@@ -401,8 +454,12 @@ map("i", "<CR>", function()
 	end
 	return "<CR>"
 end, { expr = true, desc = "Confirmar completado o nueva línea" })
-map("i", "<Tab>", function() return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>" end, { expr = true })
-map("i", "<S-Tab>", function() return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>" end, { expr = true })
+map("i", "<Tab>", function()
+	return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
+end, { expr = true })
+map("i", "<S-Tab>", function()
+	return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
+end, { expr = true })
 
 -- ----------------------------------------------------------------------------
 -- 7. DIAGNÓSTICOS
@@ -424,86 +481,186 @@ vim.diagnostic.config({
 	float = { border = "rounded", source = true },
 })
 
-map("n", "]d", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Diag: siguiente" })
-map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "Diag: anterior" })
+map("n", "]d", function()
+	vim.diagnostic.jump({ count = 1 })
+end, { desc = "Diag: siguiente" })
+map("n", "[d", function()
+	vim.diagnostic.jump({ count = -1 })
+end, { desc = "Diag: anterior" })
 map("n", "<leader>ld", vim.diagnostic.open_float, { desc = "Diag: línea actual" })
 map("n", "<leader>ll", vim.diagnostic.setloclist, { desc = "Diag: loclist" })
+
+require("diffview").setup()
+require("markview").setup()
 
 -- ----------------------------------------------------------------------------
 -- 8. INTEGRACIÓN CON EL TEMA DE OMARCHY
 -- ----------------------------------------------------------------------------
--- Neovim sigue el tema activo de Omarchy. Cada tema expone un spec estilo
--- LazyVim en ~/.config/omarchy/current/theme/neovim.lua del que extraemos el
--- repo del colorscheme y su nombre; el plugin se instala de forma perezosa con
--- vim.pack (solo el del tema en uso). El hook ~/.config/omarchy/hooks/theme-set
--- invoca OmarchyReloadTheme() vía --remote-expr en las instancias vivas.
+-- Neovim sigue el tema activo de Omarchy. Cada tema expone en
+-- ~/.config/omarchy/current/theme/neovim.lua un spec estilo LazyVim con el
+-- plugin del colorscheme. Lo cargamos tal cual: instalamos ese plugin con
+-- vim.pack (solo el del tema en uso), respetamos el branch/tag que fije y
+-- ejecutamos su config() si lo trae (ahí viven los colores personalizados de
+-- temas como greek-noir, ristretto o solarized). El hook
+-- ~/.config/omarchy/hooks/theme-set invoca OmarchyReloadTheme() por RPC en las
+-- instancias vivas.
 
 local omarchy = {
 	dir = vim.env.HOME .. "/.config/omarchy/current/theme",
+	plug_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt",
 	fallback = "default", -- colorscheme de respaldo si algo falla
 }
 
--- Lee el neovim.lua del tema (spec LazyVim) y devuelve { repo, name, colorscheme }.
--- Omarchy usa dos formatos: una lista de specs { {plugin}, {LazyVim, opts} } o
--- un spec plano único { "owner/repo", config = function() ... end }.
-local function omarchy_spec()
+-- Carga el neovim.lua del tema y separa el spec del plugin del colorscheme del
+-- spec de LazyVim (del que solo nos interesa el nombre del colorscheme).
+-- Soporta los dos formatos que usa Omarchy:
+--   lista: { { "owner/repo", opts=…, config=… }, { "LazyVim/LazyVim", opts={colorscheme=…} } }
+--   plano: { "owner/repo", opts=…, config=… }
+local function omarchy_theme()
 	local chunk = loadfile(omarchy.dir .. "/neovim.lua")
-	if not chunk then return nil end
+	if not chunk then
+		return nil
+	end
 	local ok, spec = pcall(chunk)
-	if not ok or type(spec) ~= "table" then return nil end
-
-	-- Formato plano: el repo es el primer elemento; el colorscheme vive en un
-	-- config() que no podemos inspeccionar, así que se infiere del repo.
-	if type(spec[1]) == "string" then
-		return { repo = spec[1], name = spec.name }
+	if not ok or type(spec) ~= "table" then
+		return nil
 	end
 
-	local info = {}
-	for _, entry in ipairs(spec) do
-		local repo = type(entry) == "table" and entry[1]
-		if type(repo) == "string" then
-			if repo == "LazyVim/LazyVim" then
-				if type(entry.opts) == "table" then
-					info.colorscheme = entry.opts.colorscheme or info.colorscheme
-				end
+	local entries = type(spec[1]) == "string" and { spec } or spec
+	local plugin, colorscheme
+	for _, e in ipairs(entries) do
+		if type(e) == "table" and type(e[1]) == "string" then
+			if e[1] == "LazyVim/LazyVim" then
+				colorscheme = (type(e.opts) == "table" and e.opts.colorscheme) or colorscheme
 			else
-				info.repo = repo
-				info.name = entry.name -- algunos temas fijan el nombre del directorio
+				plugin = e -- spec del colorscheme
 			end
 		end
 	end
-	return info.repo and info or nil
+	return plugin and { plugin = plugin, colorscheme = colorscheme } or nil
 end
 
--- Aplica un colorscheme tolerando los alias de LazyVim (p.ej. "catppuccin-nvim"
--- no existe como tal; el colorscheme real es "catppuccin").
+-- Aplica un colorscheme tolerando el alias de LazyVim (p. ej. el colorscheme
+-- real de "catppuccin-nvim" es "catppuccin").
 local function apply_colorscheme(name)
-	if not name or name == "" then return false end
+	if type(name) ~= "string" or name == "" then
+		return false
+	end
 	for _, c in ipairs({ name, (name:gsub("%-nvim$", "")) }) do
-		if pcall(vim.cmd.colorscheme, c) then return true end
+		if pcall(vim.cmd.colorscheme, c) then
+			return true
+		end
 	end
 	return false
 end
 
-function _G.OmarchyReloadTheme()
-	-- Fondo claro/oscuro según la marca light.mode del tema.
-	vim.o.background = (vim.uv.fs_stat(omarchy.dir .. "/light.mode") ~= nil) and "light" or "dark"
+-- Descarta del cache de require el módulo del tema y sus submódulos, para que el
+-- require de abajo lea la revisión recién puesta en disco. Necesario al recargar
+-- en caliente entre temas que comparten plugin base en ramas distintas (p. ej.
+-- aether v2 en greek-noir vs v3 en cpunk).
+local function unload_module(name)
+	for mod in pairs(package.loaded) do
+		if mod == name or mod:sub(1, #name + 1) == name .. "." then
+			package.loaded[mod] = nil
+		end
+	end
+end
 
-	local info = omarchy_spec()
-	if not info then
+-- vim.pack.add no reajusta la revisión de un plugin ya presente en disco. Lo
+-- llevamos a la que pide el tema (branch/tag/commit o, si no fija ninguna, la
+-- rama por defecto del repo) y SOLO si de verdad difiere —así no hace ruido en
+-- cada arranque—. Hacemos el checkout nosotros (no vim.pack.update) porque, en
+-- una instancia viva, su estado en memoria impide cambiar de rama de forma
+-- fiable. Hace falta al alternar temas que comparten plugin base en ramas
+-- distintas (p. ej. aether v2 en greek-noir vs la default en cpunk).
+local function sync_revision(name, ref)
+	local path = omarchy.plug_dir .. "/" .. name
+	local function git(...)
+		return vim.system({ "git", "-C", path, ... }):wait()
+	end
+	local function rev(r)
+		local out = git("rev-parse", "--verify", "--quiet", r .. "^{commit}")
+		return out.code == 0 and vim.trim(out.stdout) or nil
+	end
+	if not ref then
+		local def = git("rev-parse", "--abbrev-ref", "origin/HEAD")
+		ref = def.code == 0 and vim.trim(def.stdout) or nil -- p. ej. "origin/v3"
+	end
+	local want = ref and (rev(ref) or rev("origin/" .. ref))
+	if want and rev("HEAD") ~= want then
+		git("checkout", "--quiet", want)
+	end
+end
+
+-- Instala (si falta) y carga un plugin a partir de su spec, que puede ser un
+-- string "owner/repo" o una tabla { "owner/repo", name=…, branch=… }. Devuelve
+-- el nombre con que quedó en disco. `force_default` decide qué hacer cuando el
+-- spec no fija revisión: el plugin principal va a la rama por defecto del repo,
+-- pero una dependencia respeta la que ya esté instalada (suelen no fijar branch
+-- y comparten plugin con otros temas; p. ej. aether en v2 para greek-noir).
+local function add_plugin(spec, force_default)
+	local repo = type(spec) == "string" and spec or (type(spec) == "table" and spec[1])
+	if type(repo) ~= "string" then
+		return nil
+	end
+	local opts = type(spec) == "table" and spec or {}
+	local name = opts.name or repo:match("([^/]+)$")
+	local ref = opts.version or opts.branch or opts.tag or opts.commit
+	local existed = vim.uv.fs_stat(omarchy.plug_dir .. "/" .. name) ~= nil
+	pcall(vim.pack.add, { { src = "https://github.com/" .. repo, name = name, version = ref } })
+	if existed and (ref or force_default) then
+		sync_revision(name, ref)
+	end
+	return name
+end
+
+function _G.OmarchyReloadTheme()
+	-- Fondo claro/oscuro según el marcador light.mode del tema.
+	vim.o.background = vim.uv.fs_stat(omarchy.dir .. "/light.mode") and "light" or "dark"
+
+	local theme = omarchy_theme()
+	if not theme then
 		pcall(vim.cmd.colorscheme, omarchy.fallback)
 		return ""
 	end
 
-	-- Instala perezosamente el plugin del colorscheme del tema activo.
-	local name = info.name or info.repo:match("([^/]+)$")
-	pcall(vim.pack.add, { { src = "https://github.com/" .. info.repo, name = name } })
+	local plugin = theme.plugin
 
-	-- Nombre del colorscheme: el declarado por el tema o, si falta, el del repo.
-	if not apply_colorscheme(info.colorscheme) then
-		if not apply_colorscheme((name:gsub("%.nvim$", ""))) then
-			pcall(vim.cmd.colorscheme, omarchy.fallback)
+	-- Algunos temas se construyen sobre otro plugin y lo declaran en
+	-- `dependencies` (p. ej. hackerman hace require("aether").load(...)). Hay que
+	-- instalarlas y cargarlas ANTES del colorscheme.
+	local deps = {}
+	for _, dep in ipairs(plugin.dependencies or {}) do
+		deps[#deps + 1] = add_plugin(dep, false)
+	end
+
+	-- Plugin del colorscheme del tema activo.
+	local name = add_plugin(plugin, true)
+
+	-- Recarga limpia (dependencias + principal) para que los require lean la
+	-- revisión recién puesta en disco al alternar versiones en caliente.
+	for _, d in ipairs(deps) do
+		if d then
+			unload_module(d)
 		end
+	end
+	unload_module(name)
+
+	-- Si el tema trae config(), lo ejecutamos como lo haría LazyVim: recibe
+	-- (spec, opts) y normalmente hace require(...).setup(opts) + colorscheme.
+	-- Acá viven los colores 100% personalizados (aether, monokai-pro, solarized…).
+	if type(plugin.config) == "function" and pcall(plugin.config, plugin, plugin.opts or {}) then
+		return ""
+	end
+
+	-- Tema sin config: aplicamos opts (si hay) y el colorscheme declarado.
+	if type(plugin.opts) == "table" and next(plugin.opts) then
+		pcall(function()
+			require(name).setup(plugin.opts)
+		end)
+	end
+	if not apply_colorscheme(theme.colorscheme) and not apply_colorscheme(name) then
+		pcall(vim.cmd.colorscheme, omarchy.fallback)
 	end
 	return ""
 end
