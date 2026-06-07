@@ -38,6 +38,7 @@ MODULE_KEYS=(
     ohmyposh
     doom
     vesper
+    omarchy
 )
 
 MODULE_DESCS=(
@@ -51,6 +52,7 @@ MODULE_DESCS=(
     "Oh-My-Posh star prompt theme"
     "Doom Emacs config"
     "Omarchy Vesper theme"
+    "Omarchy theme-set hook + walker template"
 )
 
 # Selection state — 1 = selected, 0 = not. Default: all on.
@@ -130,6 +132,24 @@ install_doom() {
 }
 
 install_vesper()   { _link "$DOTS/vesper" "$HOME/.config/omarchy/themes/vesper"; }
+
+# Omarchy glue: the theme-set hook (reloads tmux/nvim + regenerates Walker from
+# walker.css.tpl so third-party themes can't override your Walker style) and the
+# Walker template itself. Linked as individual files — never the whole omarchy/
+# dir, which Omarchy manages (current/, themes/, etc.).
+install_omarchy() {
+    _link "$DOTS/omarchy/hooks/theme-set"       "$HOME/.config/omarchy/hooks/theme-set"
+    _link "$DOTS/omarchy/themed/walker.css.tpl" "$HOME/.config/omarchy/themed/walker.css.tpl"
+
+    # Cursor's CLI hangs on `--list-extensions`, which stalls omarchy-theme-set
+    # inside omarchy-theme-set-vscode — BEFORE the theme-set hook runs — so theme
+    # changes never reach the Walker regeneration. If Cursor is installed and its
+    # CLI hangs, tell Omarchy to skip it during theme changes (flag file toggle).
+    if command -v cursor >/dev/null 2>&1 && ! timeout 8 cursor --list-extensions >/dev/null 2>&1; then
+        mkdir -p "$HOME/.local/state/omarchy/toggles"
+        touch "$HOME/.local/state/omarchy/toggles/skip-cursor-theme-changes"
+    fi
+}
 
 # ─── TUI primitives ───────────────────────────────────────────────────────────
 
@@ -285,13 +305,14 @@ install_selected() {
 }
 
 post_install() {
-    local need_hypr=0 need_waybar=0 hint_doom=0 hint_shell=0 i
+    local need_hypr=0 need_waybar=0 need_omarchy=0 hint_doom=0 hint_shell=0 i
 
     for ((i = 0; i < ${#MODULE_KEYS[@]}; i++)); do
         [ "${SELECTED[i]}" -eq 1 ] || continue
         case "${MODULE_KEYS[i]}" in
             hypr)      need_hypr=1 ;;
             waybar)    need_waybar=1 ;;
+            omarchy)   need_omarchy=1 ;;
             doom)      hint_doom=1 ;;
             zsh | tmux) hint_shell=1 ;;
         esac
@@ -305,6 +326,18 @@ post_install() {
 
     if [ "$need_waybar" -eq 1 ] && command -v omarchy-restart-waybar >/dev/null 2>&1; then
         omarchy-restart-waybar >/dev/null 2>&1 && _ok "waybar restarted"
+    fi
+
+    # Run the theme-set hook once for the active theme so the Walker template
+    # applies immediately (regenerates walker.css), then restart Walker.
+    if [ "$need_omarchy" -eq 1 ] && command -v omarchy-hook >/dev/null 2>&1; then
+        local theme_name
+        theme_name="$(cat "$HOME/.config/omarchy/current/theme.name" 2>/dev/null || true)"
+        if [ -n "$theme_name" ]; then
+            omarchy-hook theme-set "$theme_name" >/dev/null 2>&1 || true
+            command -v omarchy-restart-walker >/dev/null 2>&1 && omarchy-restart-walker >/dev/null 2>&1
+            _ok "walker template applied (theme: $theme_name)"
+        fi
     fi
 
     [ "$hint_doom"  -eq 1 ] && _info "run ${BOLD}doom sync${RESET} to apply emacs package changes"

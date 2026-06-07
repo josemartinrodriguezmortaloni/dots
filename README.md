@@ -11,11 +11,12 @@ Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and mode
 | **ghostty** | Ghostty terminal with Vesper colors, JetBrainsMono Nerd Font |
 | **hypr** | Hyprland compositor — keybindings, animations, dual monitor, NVIDIA |
 | **waybar** | Status bar with custom window pill, workspace indicators |
-| **walker** | App launcher config |
+| **walker** | App launcher config (style stays consistent across all themes) |
 | **tmux** | Tmux with C-Space prefix, vi mode, Vesper theme |
 | **zsh** | Zsh with Zinit, oh-my-posh (star theme), fzf-tab, syntax highlighting |
 | **ohmyposh** | Oh-My-Posh prompt theme |
 | **vesper** | Omarchy Vesper theme — Mellow base + Vesper accents (bdsqqq style) |
+| **omarchy** | Omarchy `theme-set` hook + Walker template (keeps your Walker style on every theme, reloads tmux/nvim) |
 
 ## Color palette
 

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Reload tmux theme on Omarchy theme change
+if command -v tmux &>/dev/null && tmux list-sessions &>/dev/null 2>&1; then
+  tmux source-file ~/.config/tmux/tmux.conf
+fi
+
+# Reload running Neovim instances (uses RPC; non-disruptive)
+for sock in /run/user/$(id -u)/nvim.*.0; do
+  [ -S "$sock" ] || continue
+  nvim --server "$sock" --remote-expr 'v:lua.OmarchyReloadTheme()' >/dev/null 2>&1
+done
+
+# Forzar TU template de Walker en todos los temas.
+# Algunos temas de terceros (Greek Noir, cpunk, whitegold, amekoji, dayfox,
+# solarized-light) traen su propio walker.css. El generador de Omarchy NO
+# sobreescribe ese archivo, asi que tu ~/.config/omarchy/themed/walker.css.tpl
+# queda ignorado y Walker pierde tu estilo (p. ej. el border-radius de 12px).
+# Lo regeneramos reusando el generador oficial: Walker mantiene SIEMPRE tu
+# estilo y del tema activo solo se toman los colores (colors.toml).
+walker_tpl="$HOME/.config/omarchy/themed/walker.css.tpl"
+cur="$HOME/.config/omarchy/current/theme"
+next="$HOME/.config/omarchy/current/next-theme"
+if [ -f "$walker_tpl" ] && [ -f "$cur/colors.toml" ]; then
+  : "${OMARCHY_PATH:=$HOME/.local/share/omarchy}"
+  export OMARCHY_PATH
+  rm -rf "$next"
+  mkdir -p "$next"
+  cp "$cur/colors.toml" "$next/colors.toml"
+  omarchy-theme-set-templates
+  [ -f "$next/walker.css" ] && cp -f "$next/walker.css" "$cur/walker.css"
+  rm -rf "$next"
+fi

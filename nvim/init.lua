@@ -137,8 +137,9 @@ vim.pack.add({
 	"https://github.com/NvChad/nvterm",
 	"https://github.com/stevearc/conform.nvim",
 	"https://github.com/nvim-mini/mini.nvim",
-	"https://github.com/catppuccin/nvim",
 })
+-- El plugin del colorscheme NO se declara acá: lo instala de forma perezosa la
+-- integración con Omarchy (sección 8), solo el del tema activo.
 
 -- ----------------------------------------------------------------------------
 -- 5. SETUP DE PLUGINS
@@ -429,25 +430,81 @@ map("n", "<leader>ld", vim.diagnostic.open_float, { desc = "Diag: línea actual"
 map("n", "<leader>ll", vim.diagnostic.setloclist, { desc = "Diag: loclist" })
 
 -- ----------------------------------------------------------------------------
--- 8. OMARCHY THEME INTEGRATION
+-- 8. INTEGRACIÓN CON EL TEMA DE OMARCHY
 -- ----------------------------------------------------------------------------
--- Sigue el tema actual de Omarchy. El hook ~/.config/omarchy/hooks/theme-set
--- llama OmarchyReloadTheme() vía --remote-expr en todas las instancias vivas.
+-- Neovim sigue el tema activo de Omarchy. Cada tema expone un spec estilo
+-- LazyVim en ~/.config/omarchy/current/theme/neovim.lua del que extraemos el
+-- repo del colorscheme y su nombre; el plugin se instala de forma perezosa con
+-- vim.pack (solo el del tema en uso). El hook ~/.config/omarchy/hooks/theme-set
+-- invoca OmarchyReloadTheme() vía --remote-expr en las instancias vivas.
 
-require("catppuccin").setup({
-	background = { light = "latte", dark = "mocha" },
-	integrations = {
-		treesitter = true,
-		fzf = true,
-		native_lsp = { enabled = true },
-		mini = { enabled = true },
-	},
-})
+local omarchy = {
+	dir = vim.env.HOME .. "/.config/omarchy/current/theme",
+	fallback = "default", -- colorscheme de respaldo si algo falla
+}
+
+-- Lee el neovim.lua del tema (spec LazyVim) y devuelve { repo, name, colorscheme }.
+-- Omarchy usa dos formatos: una lista de specs { {plugin}, {LazyVim, opts} } o
+-- un spec plano único { "owner/repo", config = function() ... end }.
+local function omarchy_spec()
+	local chunk = loadfile(omarchy.dir .. "/neovim.lua")
+	if not chunk then return nil end
+	local ok, spec = pcall(chunk)
+	if not ok or type(spec) ~= "table" then return nil end
+
+	-- Formato plano: el repo es el primer elemento; el colorscheme vive en un
+	-- config() que no podemos inspeccionar, así que se infiere del repo.
+	if type(spec[1]) == "string" then
+		return { repo = spec[1], name = spec.name }
+	end
+
+	local info = {}
+	for _, entry in ipairs(spec) do
+		local repo = type(entry) == "table" and entry[1]
+		if type(repo) == "string" then
+			if repo == "LazyVim/LazyVim" then
+				if type(entry.opts) == "table" then
+					info.colorscheme = entry.opts.colorscheme or info.colorscheme
+				end
+			else
+				info.repo = repo
+				info.name = entry.name -- algunos temas fijan el nombre del directorio
+			end
+		end
+	end
+	return info.repo and info or nil
+end
+
+-- Aplica un colorscheme tolerando los alias de LazyVim (p.ej. "catppuccin-nvim"
+-- no existe como tal; el colorscheme real es "catppuccin").
+local function apply_colorscheme(name)
+	if not name or name == "" then return false end
+	for _, c in ipairs({ name, (name:gsub("%-nvim$", "")) }) do
+		if pcall(vim.cmd.colorscheme, c) then return true end
+	end
+	return false
+end
 
 function _G.OmarchyReloadTheme()
-	local light_mode = vim.env.HOME .. "/.config/omarchy/current/theme/light.mode"
-	vim.o.background = (vim.uv.fs_stat(light_mode) ~= nil) and "light" or "dark"
-	pcall(vim.cmd.colorscheme, "catppuccin")
+	-- Fondo claro/oscuro según la marca light.mode del tema.
+	vim.o.background = (vim.uv.fs_stat(omarchy.dir .. "/light.mode") ~= nil) and "light" or "dark"
+
+	local info = omarchy_spec()
+	if not info then
+		pcall(vim.cmd.colorscheme, omarchy.fallback)
+		return ""
+	end
+
+	-- Instala perezosamente el plugin del colorscheme del tema activo.
+	local name = info.name or info.repo:match("([^/]+)$")
+	pcall(vim.pack.add, { { src = "https://github.com/" .. info.repo, name = name } })
+
+	-- Nombre del colorscheme: el declarado por el tema o, si falta, el del repo.
+	if not apply_colorscheme(info.colorscheme) then
+		if not apply_colorscheme((name:gsub("%.nvim$", ""))) then
+			pcall(vim.cmd.colorscheme, omarchy.fallback)
+		end
+	end
 	return ""
 end
 
