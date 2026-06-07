@@ -31,3 +31,8 @@ if [ -f "$walker_tpl" ] && [ -f "$cur/colors.toml" ]; then
   [ -f "$next/walker.css" ] && cp -f "$next/walker.css" "$cur/walker.css"
   rm -rf "$next"
 fi
+
+# Regenerar el tema de cliamp con los colores del nuevo tema y recargarlo en vivo
+# (funciona aunque cliamp corra dentro de tmux, vía su IPC).
+cliamp_theme="$HOME/.config/waybar/scripts/cliamp-omarchy-theme.sh"
+[ -x "$cliamp_theme" ] && "$cliamp_theme" >/dev/null 2>&1

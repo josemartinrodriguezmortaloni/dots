@@ -5,7 +5,7 @@
   "output": "DP-1",
   "spacing": 0,
   "height": 26,
-  "modules-left": ["custom/omarchy", "hyprland/workspaces"],
+  "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/cliamp", "custom/cliamp-prev", "custom/cliamp-playpause", "custom/cliamp-next"],
   "modules-center": ["clock", "custom/weather", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
   "modules-right": [
     "group/tray-expander",
@@ -53,6 +53,35 @@
     "tooltip-format": "Omarchy update available",
     "signal": 7,
     "interval": 21600
+  },
+  "custom/cliamp": {
+    "exec": "~/.config/waybar/scripts/cliamp-status.sh",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "escape": true,
+    "max-length": 45,
+    "on-click": "~/.config/waybar/scripts/cliamp-open.sh",
+    "on-click-right": "cliamp toggle",
+    "on-scroll-up": "cliamp next",
+    "on-scroll-down": "cliamp prev"
+  },
+  "custom/cliamp-prev": {
+    "format": "󰒮",
+    "tooltip-format": "Pista anterior",
+    "on-click": "cliamp prev"
+  },
+  "custom/cliamp-playpause": {
+    "exec": "~/.config/waybar/scripts/cliamp-status.sh playpause",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "on-click": "cliamp toggle"
+  },
+  "custom/cliamp-next": {
+    "format": "󰒭",
+    "tooltip-format": "Pista siguiente",
+    "on-click": "cliamp next"
   },
 
   "cpu": {
