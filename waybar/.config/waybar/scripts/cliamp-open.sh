@@ -12,7 +12,7 @@ dir="$(dirname "$(readlink -f "$0")")"
 "$dir/cliamp-omarchy-theme.sh" >/dev/null 2>&1
 
 cfg="$HOME/.config/cliamp/config.toml"
-[[ -f "$cfg" ]] && sed -i 's/^theme[[:space:]]*=.*/theme = "omarchy"/' "$cfg"
+[[ -f "$cfg" ]] && sed -i 's/^theme[[:space:]]*=.*/theme = "Default - Terminal colors"/' "$cfg"
 
 exec omarchy-launch-or-focus "org.omarchy.cliamp" \
   "uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.cliamp -e $dir/cliamp-tmux.sh"
