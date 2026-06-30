@@ -7,7 +7,7 @@
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name "José Rodriguez"
-      user-mail-address "jmrodriguezm13@gmail.com")
+      user-mail-address "randonm mail")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -135,13 +135,6 @@
          "* Resumen\n%?\n\n* Datos Importantes\n- \n\n* Citas Textuales\n#+begin_quote\n\n#+end_quote\n\n* Preguntas Abiertas\n- [ ] \n\n* Insights Personales\n- \n\n* Patrones Identificados\n- "
          :if-new (file+head "lectura/${slug}.org"
                             "#+title: ${title}\n#+filetags: :lectura:capitulo:\n#+date: %U\n")
-         :unnarrowed t)
-
-        ;; Patrón
-        ("p" "patrón" plain
-         "* Definición\n%?\n\n* Cuándo Aplica\n\n\n* Ejemplos\n- Dominio 1: \n- Dominio 2: \n\n* Contraejemplos\n\n\n* Insights\n\n\n* Conexiones\n- \n\n* Fuente\n- Libro: \n- Página: "
-         :if-new (file+head "patrones/${slug}.org"
-                            "#+title: ${title}\n#+filetags: :patron:\n#+date: %U\n")
          :unnarrowed t)
 
         ;; Proyecto
