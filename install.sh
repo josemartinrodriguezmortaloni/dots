@@ -140,6 +140,7 @@ install_vesper()   { _link "$DOTS/vesper" "$HOME/.config/omarchy/themes/vesper";
 install_omarchy() {
     _link "$DOTS/omarchy/hooks/theme-set"       "$HOME/.config/omarchy/hooks/theme-set"
     _link "$DOTS/omarchy/themed/walker.css.tpl" "$HOME/.config/omarchy/themed/walker.css.tpl"
+    _link "$DOTS/omarchy/background/" "$HOME/.config/omarchy/current/theme/backgrounds"
 
     # Cursor's CLI hangs on `--list-extensions`, which stalls omarchy-theme-set
     # inside omarchy-theme-set-vscode — BEFORE the theme-set hook runs — so theme

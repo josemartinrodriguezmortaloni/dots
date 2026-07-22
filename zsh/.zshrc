@@ -206,3 +206,7 @@ esac
 # pnpm end
 
 export PATH="/home/m4s1t4/.pixi/bin:$PATH"
+
+# Android SDK (Expo / React Native)
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
