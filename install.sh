@@ -140,7 +140,29 @@ install_vesper()   { _link "$DOTS/vesper" "$HOME/.config/omarchy/themes/vesper";
 install_omarchy() {
     _link "$DOTS/omarchy/hooks/theme-set"       "$HOME/.config/omarchy/hooks/theme-set"
     _link "$DOTS/omarchy/themed/walker.css.tpl" "$HOME/.config/omarchy/themed/walker.css.tpl"
-    _link "$DOTS/omarchy/background/" "$HOME/.config/omarchy/current/theme/backgrounds"
+
+    # Wallpapers: omarchy-theme-bg-next looks for user backgrounds in
+    # ~/.config/omarchy/backgrounds/<theme-slug>/ — one folder per theme, named
+    # after theme.name. To expose the shared pool (omarchy/backgrounds/*.png) to
+    # *every* installed theme, symlink one <slug> folder per theme at the pool.
+    # These sit alongside the theme's own backgrounds (find combines both dirs),
+    # so nothing is lost. Slug = basename of the theme dir, in either location.
+    local pool="$DOTS/omarchy/backgrounds"
+    local bg_root="$HOME/.config/omarchy/backgrounds"
+
+    # bg_root must be a real dir holding per-theme symlinks — not a symlink itself
+    # (an older version linked the whole dir, which broke detection).
+    [ -L "$bg_root" ] && rm "$bg_root"
+    mkdir -p "$bg_root"
+
+    local themes_dir theme slug
+    for themes_dir in "$HOME/.config/omarchy/themes" "$HOME/.local/share/omarchy/themes"; do
+        [ -d "$themes_dir" ] || continue
+        for theme in "$themes_dir"/*/; do
+            slug="$(basename "$theme")"
+            _link "$pool" "$bg_root/$slug"
+        done
+    done
 
     # Cursor's CLI hangs on `--list-extensions`, which stalls omarchy-theme-set
     # inside omarchy-theme-set-vscode — BEFORE the theme-set hook runs — so theme

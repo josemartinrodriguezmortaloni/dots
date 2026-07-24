@@ -20,20 +20,8 @@
 ;;
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
-(setq doom-font (font-spec :family "iAWriterQuattroV" :size 16)
-      doom-variable-pitch-font (font-spec :family "iAWriterQuattroV" :size 18)
-      doom-big-font (font-spec :family "iAWriterQuattroV" :size 22)
-      doom-symbol-font (font-spec :family "GeistMono Nerd Font" :size 16))
-
-(defun my/setup-nerd-font-fallback ()
-  "Map Nerd Font PUA ranges to GeistMono Nerd Font."
-  (let ((nerd-font (font-spec :family "GeistMono Nerd Font")))
-    (set-fontset-font t '(#xe000 . #xf8ff) nerd-font)
-    (set-fontset-font t '(#xf0001 . #xf1af0) nerd-font)
-    (set-fontset-font t '(#xea60 . #xebe9) nerd-font)
-    (set-fontset-font t '(#xe0a0 . #xe0d4) nerd-font)))
-
-(add-hook 'after-setting-font-hook #'my/setup-nerd-font-fallback)
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 18 :weight 'medium)
+      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 18))
 
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
