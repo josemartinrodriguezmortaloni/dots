@@ -465,13 +465,34 @@
  '(markdown-header-face-5 ((t (:inherit markdown-header-face :height 1.2))))
  '(markdown-header-face-6 ((t (:inherit markdown-header-face :height 1.1)))))
 
-;; Toggle Markdown View
+;; Render "in-line" al editar: markup oculto, código fontificado por su lenguaje,
+;; URLs colapsadas. Lo más cercano a render-markdown.nvim sin salir de la edición.
+;; (El markup se oculta en todo el buffer; los caracteres siguen ahí para editar.)
+(after! markdown-mode
+  (setq markdown-hide-markup t                    ; oculta **, _, y otros marcadores
+        markdown-hide-urls t                       ; muestra el texto del link, no la URL
+        markdown-fontify-code-blocks-natively t    ; código con el highlight de su lenguaje
+        markdown-fontify-whole-heading-line t))
+
+;; Toggle edición ⇄ lectura (SPC t m). En vista de lectura: mixed-pitch
+;; (prosa proporcional, código monoespaciado) + imágenes inline.
 (defun dt/toggle-markdown-view-mode ()
-  "Toggle between `markdown-mode' and `markdown-view-mode'."
+  "Alterna entre `markdown-mode' (edición) y `markdown-view-mode' (lectura)."
   (interactive)
   (if (eq major-mode 'markdown-view-mode)
       (markdown-mode)
     (markdown-view-mode)))
+
+(defun dt/markdown-reader-setup ()
+  "Ajustes visuales de lectura al entrar en `markdown-view-mode'."
+  (mixed-pitch-mode 1)
+  (ignore-errors (markdown-display-inline-images)))
+(add-hook 'markdown-view-mode-hook #'dt/markdown-reader-setup)
+
+;; Tablas alineadas visualmente en markdown y org (valign).
+(use-package! valign
+  :hook ((markdown-mode org-mode) . valign-mode)
+  :config (setq valign-fancy-bar t))
 
 ;; ============================
 ;; Window & Buffer Navigation
@@ -489,6 +510,47 @@
       :desc "Split vertical"   "|"   #'evil-window-vsplit
       :desc "Split horizontal" "\\"  #'evil-window-split
       :desc "Ace window jump"  "w w" #'ace-window)
+
+;; ============================================================================
+;; NVIM-STYLE KEYMAPS — memoria muscular traída desde nvim/init.lua (aditivo)
+;; ============================================================================
+;; Solo lo que NO pisa convenciones de Doom. La navegación de ventanas sigue en
+;; SPC w h/j/k/l y C-w (no toco C-h = prefijo de ayuda de Emacs).
+
+;; Buffers con H / L (Shift-h / Shift-l), como en nvim.
+;; Nota: pisa los movimientos High/Low de evil (tope/fondo de pantalla).
+(map! :n "H" #'previous-buffer
+      :n "L" #'next-buffer)
+
+;; Visual: mover la selección arriba/abajo re-seleccionando (nvim J/K = gv=gv).
+(map! :v "J" (concat ":m '>+1" (kbd "RET") "gv=gv")
+      :v "K" (concat ":m '<-2" (kbd "RET") "gv=gv"))
+
+;; Visual: indentar manteniendo la selección (nvim < / >).
+(map! :v "<" (cmd! (evil-shift-left (region-beginning) (region-end))
+                   (evil-visual-restore))
+      :v ">" (cmd! (evil-shift-right (region-beginning) (region-end))
+                   (evil-visual-restore)))
+
+;; Scroll de media página recentrando el cursor (nvim C-d/C-u + zz).
+(map! :n "C-d" (cmd! (evil-scroll-down nil) (recenter))
+      :n "C-u" (cmd! (evil-scroll-up nil) (recenter)))
+
+;; Búsqueda: siguiente/anterior recentrando (nvim n/N + zz).
+(map! :n "n" (cmd! (evil-ex-search-next) (recenter))
+      :n "N" (cmd! (evil-ex-search-previous) (recenter)))
+
+;; SPC e — explorador de archivos (treemacs), como <leader>e en nvim.
+(map! :leader :desc "Explorer (treemacs)" "e" #'+treemacs/toggle)
+
+;; SPC b d — kill buffer (alias del SPC b k de Doom).
+(map! :leader :desc "Kill buffer" "b d" #'kill-current-buffer)
+
+;; M-i — terminal flotante (vterm) global, espeja <A-i> de nvim.
+;; En Emacs GUI la tecla Alt manda Meta, así que <A-i> ≡ M-i.
+(map! "M-i" #'+vterm/toggle)
+(after! vterm
+  (define-key vterm-mode-map (kbd "M-i") #'+vterm/toggle))
 
 ;; ============================
 ;; Python Development
