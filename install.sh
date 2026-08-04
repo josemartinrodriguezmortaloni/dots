@@ -36,7 +36,7 @@ MODULE_KEYS=(
     tmux
     zsh
     ohmyposh
-    doom
+    nano
     vesper
     omarchy
 )
@@ -50,7 +50,7 @@ MODULE_DESCS=(
     "Tmux with C-Space prefix"
     "Zsh + Zinit + oh-my-posh"
     "Oh-My-Posh star prompt theme"
-    "Doom Emacs config"
+    "N Λ N O Emacs config"
     "Omarchy Vesper theme"
     "Omarchy theme-set hook + walker template"
 )
@@ -125,10 +125,24 @@ install_zsh() {
 
 install_ohmyposh() { _link "$DOTS/ohmyposh/star.omp.json" "$HOME/.config/ohmyposh/star.omp.json"; }
 
-install_doom() {
-    _link "$DOTS/doom/init.el"     "$HOME/.config/doom/init.el"
-    _link "$DOTS/doom/config.el"   "$HOME/.config/doom/config.el"
-    _link "$DOTS/doom/packages.el" "$HOME/.config/doom/packages.el"
+# N Λ N O Emacs. Only init.el and early-init.el are linked — init.el resolves
+# its own symlink to find layers/, so the layer files need no links of their
+# own. Upstream nano is a plain clone under ~/.config/emacs/upstream and is
+# treated as read-only; the config never edits it.
+#
+# doom/ stays in the repo as an inactive backup and is deliberately absent from
+# MODULE_KEYS: linking it would put Emacs back under Doom.
+install_nano() {
+    local upstream="$HOME/.config/emacs/upstream"
+
+    if [ ! -d "$upstream/.git" ]; then
+        _info "cloning nano-emacs upstream"
+        git clone --depth 1 https://github.com/rougier/nano-emacs.git "$upstream" >/dev/null 2>&1 \
+            || _err "failed to clone nano-emacs"
+    fi
+
+    _link "$DOTS/nano/init.el"       "$HOME/.config/emacs/init.el"
+    _link "$DOTS/nano/early-init.el" "$HOME/.config/emacs/early-init.el"
 }
 
 install_vesper()   { _link "$DOTS/vesper" "$HOME/.config/omarchy/themes/vesper"; }
@@ -328,7 +342,7 @@ install_selected() {
 }
 
 post_install() {
-    local need_hypr=0 need_waybar=0 need_omarchy=0 hint_doom=0 hint_shell=0 i
+    local need_hypr=0 need_waybar=0 need_omarchy=0 hint_nano=0 hint_shell=0 i
 
     for ((i = 0; i < ${#MODULE_KEYS[@]}; i++)); do
         [ "${SELECTED[i]}" -eq 1 ] || continue
@@ -336,7 +350,7 @@ post_install() {
             hypr)      need_hypr=1 ;;
             waybar)    need_waybar=1 ;;
             omarchy)   need_omarchy=1 ;;
-            doom)      hint_doom=1 ;;
+            nano)      hint_nano=1 ;;
             zsh | tmux) hint_shell=1 ;;
         esac
     done
@@ -363,7 +377,16 @@ post_install() {
         fi
     fi
 
-    [ "$hint_doom"  -eq 1 ] && _info "run ${BOLD}doom sync${RESET} to apply emacs package changes"
+    # Emacs prefers ~/.emacs.d over ~/.config/emacs when both exist, so a
+    # leftover Doom install silently wins and nano never loads.
+    if [ "$hint_nano" -eq 1 ]; then
+        if [ -d "$HOME/.emacs.d" ]; then
+            _warn "${BOLD}~/.emacs.d${RESET} exists and takes priority over ~/.config/emacs — remove it or nano will not load"
+        fi
+        systemctl --user is-active emacs >/dev/null 2>&1 \
+            && systemctl --user restart emacs >/dev/null 2>&1 \
+            && _ok "emacs daemon restarted"
+    fi
     [ "$hint_shell" -eq 1 ] && _info "open a new terminal to pick up zsh/tmux changes"
 }
 

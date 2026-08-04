@@ -79,3 +79,7 @@
 ;; === Markdown live rendering ===
 (package! valign)      ; alinea tablas visualmente (markdown + org)
 (package! mixed-pitch) ; prosa proporcional + código mono en la vista de lectura
+
+;; === Nano Calendar ===
+(package! nano-calendar
+  :recipe (:host github :repo "rougier/nano-calendar"))

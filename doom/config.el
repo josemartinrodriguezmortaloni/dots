@@ -21,7 +21,8 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 18 :weight 'medium)
-      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 18))
+      doom-variable-pitch-font (font-spec :family "JetBrainsMono Nerd Font" :size 18)
+      doom-big-font (font-spec :family "JetBrainsMono Nerd Font" :size 22))
 
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -586,3 +587,13 @@
       "t f" #'python-pytest-file
       "t r" #'python-pytest-last-failed
       "t a" #'python-pytest-dispatch)
+
+(use-package! nano-calendar
+  :commands (nano-calendar)
+  :init
+  (setq nano-calendar-layout '(1 . 3)
+        ;; ambos en nil evitan el bug de add-to-list bajo lexical-binding
+        nano-calendar-workload-color nil
+        nano-calendar-workload-compact nil)
+  :config
+  (add-hook 'nano-calendar-hook #'evil-emacs-state))

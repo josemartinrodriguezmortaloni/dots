@@ -52,7 +52,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Manual configuration
-PATH=$HOME/.local/bin:/root/.local/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/.emacs.d/bin:$PATH
+PATH=$HOME/.local/bin:/root/.local/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:$PATH
 
 # Oh-my-posh configuration
 eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/star.omp.json)"
@@ -73,6 +73,7 @@ alias ft='cd /home/m4s1t4/Documents/Facultad/Tercero/'
 alias fs='cd /home/m4s1t4/Documents/Facultad/Segundo/'
 em() { setsid emacs "${@:-.}" &>/dev/null & }
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+alias op='$HOME/.config/scripts/op.sh'
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then

@@ -36,3 +36,7 @@ fi
 # (funciona aunque cliamp corra dentro de tmux, vía su IPC).
 cliamp_theme="$HOME/.config/waybar/scripts/cliamp-omarchy-theme.sh"
 [ -x "$cliamp_theme" ] && "$cliamp_theme" >/dev/null 2>&1
+
+# >>> omazed hook - do not edit >>>
+omazed set "$1"
+# <<< omazed hook - do not edit <<<
