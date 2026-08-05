@@ -2,9 +2,9 @@
 export _JAVA_AWT_WM_NONREPARENTING=1
 
 # Set up the prompt
-autoload -Uz promptinit
-promptinit
-prompt adam1
+# autoload -Uz promptinit
+# promptinit
+# prompt adam1
 
 setopt histignorealldups sharehistory
 
@@ -54,9 +54,6 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # Manual configuration
 PATH=$HOME/.local/bin:/root/.local/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:$PATH
 
-# Oh-my-posh configuration
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/star.omp.json)"
-
 # Manual aliases
 alias ll='lsd -lh --group-dirs=first'
 alias la='lsd -a --group-dirs=first'
@@ -65,12 +62,10 @@ alias lla='lsd -lha --group-dirs=first'
 alias ls='lsd --group-dirs=first'
 alias cat='bat'
 alias t='tmux'
-alias ep='cd /run/media/m4s1t4/5CBE1E5BBE1E2DD0/Mis_Docs/Enprendimiento/Proyectos'
-alias ob='/run/media/m4s1t4/5CBE1E5BBE1E2DD0/Mis_Docs/EstudioProductividad/Obsidia-Vault/Jose/'
-alias f='cd /home/m4s1t4/Documents/Facultad'
-alias fc='cd /home/m4s1t4/Documents/Facultad/Cuarto/'
-alias ft='cd /home/m4s1t4/Documents/Facultad/Tercero/'
-alias fs='cd /home/m4s1t4/Documents/Facultad/Segundo/'
+alias ep='cd $HOME/Work/Enprendimiento/Proyectos/SimPlant'
+alias ep2='cd $HOME/Work/Enprendimiento/Proyectos/SimPlant/SimPlant-v2'
+alias ep3='cd $HOME/Work/Enprendimiento/Proyectos/SimPlant/SimPlant-v3'
+
 em() { setsid emacs "${@:-.}" &>/dev/null & }
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias op='$HOME/.config/scripts/op.sh'
@@ -211,3 +206,6 @@ export PATH="/home/m4s1t4/.pixi/bin:$PATH"
 # Android SDK (Expo / React Native)
 export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
+# Starship
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+eval "$(starship init zsh)"

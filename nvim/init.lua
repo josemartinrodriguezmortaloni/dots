@@ -89,6 +89,7 @@ vim.pack.add({
 	"https://github.com/nvim-mini/mini.nvim",
 	"https://github.com/nvim-tree/nvim-tree.lua.git",
 	"https://github.com/nvim-tree/nvim-web-devicons.git",
+	"https://github.com/OXY2DEV/markview.nvim.git",
 })
 
 -- mini.nvim: cherry-picking de módulos
@@ -289,4 +290,94 @@ end, { desc = "Terminal flotante" })
 -- ── 10. NVIM-TREE (<leader>e) ────────────────────────────────────────────
 
 require("nvim-tree").setup()
-map("n", "<leader>e", "<cr>:NvimTreeToggle<cr>")
+map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>")
+
+-- ── 11. Markview ────────────────────────────────────────────
+-- Disable automatic previews.
+local presets = require("markview.presets").headings
+require("markview").setup({
+	preview = { enable = true },
+	headings = presets.simple,
+	latex = {
+		enable = true,
+		blocks = {
+			enable = true,
+
+			hl = "MarkviewCode",
+			pad_char = " ",
+			pad_amount = 3,
+
+			text = "  LaTeX ",
+			text_hl = "MarkviewCodeInfo",
+		},
+		inlines = {
+			enable = true,
+
+			padding_left = " ",
+			padding_right = " ",
+
+			hl = "MarkviewInlineCode",
+		},
+		symbols = {
+			enable = true,
+
+			hl = "MarkviewComment",
+		},
+		texts = {
+			enable = true,
+		},
+	},
+	markdown = {
+		enable = true,
+
+		markdown_inline = {
+			tags = {
+				default = {
+					hl = "MarkviewCodeInfo",
+					padding_left = "",
+					padding_left_hl = "MarkviewCodeFg",
+					padding_right = "",
+					padding_right_hl = "MarkviewCodeFg",
+				},
+				enable = true,
+			},
+		},
+		tables = {
+			enable = true,
+			strict = false,
+
+			block_decorator = true,
+			use_virt_lines = false,
+
+			parts = {
+				top = { "╭", "─", "╮", "┬" },
+				header = { "│", "│", "│" },
+				separator = { "├", "─", "┤", "┼" },
+				row = { "│", "│", "│" },
+				bottom = { "╰", "─", "╯", "┴" },
+
+				overlap = { "┝", "━", "┥", "┿" },
+
+				align_left = "╼",
+				align_right = "╾",
+				align_center = { "╴", "╶" },
+			},
+
+			hl = {
+				top = { "MarkviewTableHeader", "MarkviewTableHeader", "MarkviewTableHeader", "MarkviewTableHeader" },
+				header = { "MarkviewTableHeader", "MarkviewTableHeader", "MarkviewTableHeader" },
+				separator = { "MarkviewTableHeader", "MarkviewTableHeader", "MarkviewTableHeader", "MarkviewTableHeader" },
+				row = { "MarkviewTableBorder", "MarkviewTableBorder", "MarkviewTableBorder" },
+				bottom = { "MarkviewTableBorder", "MarkviewTableBorder", "MarkviewTableBorder", "MarkviewTableBorder" },
+
+				overlap = { "MarkviewTableBorder", "MarkviewTableBorder", "MarkviewTableBorder", "MarkviewTableBorder" },
+
+				align_left = "MarkviewTableAlignLeft",
+				align_right = "MarkviewTableAlignRight",
+				align_center = { "MarkviewTableAlignCenter", "MarkviewTableAlignCenter" },
+			},
+		},
+	},
+})
+
+-- vim.api.nvim_set_keymap("n", "<leader>m", "<CMD>Markview<CR>", { desc = "Toggles `markview` previews globally." })
