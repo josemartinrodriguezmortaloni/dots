@@ -209,3 +209,18 @@ export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/late
 # Starship
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 eval "$(starship init zsh)"
+
+# Generador de módulos DDD usando la herramienta instalada con uv
+make-module() {
+  local module_name="$1"
+  local target_path="${2:-.}" # Por defecto usa el directorio actual si no se especifica path
+
+  if [ -z "$module_name" ]; then
+    echo -e "\033[0;31mError: Debes proporcionar el nombre del módulo.\033[0m"
+    echo "Uso: make-module <nombre_modulo> [path_destino]"
+    return 1
+  fi
+
+  # Cambia al directorio destino y ejecuta el CLI instalado mediante uv
+  (cd "$target_path" && uv run dddpython -p "$module_name")
+}
