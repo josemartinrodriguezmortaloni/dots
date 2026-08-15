@@ -32,7 +32,6 @@ MODULE_KEYS=(
     ghostty
     hypr
     waybar
-    walker
     tmux
     zsh
     ohmyposh
@@ -44,15 +43,14 @@ MODULE_KEYS=(
 MODULE_DESCS=(
     "Neovim 0.11+ with Vesper theme"
     "Ghostty terminal emulator"
-    "Hyprland compositor configs"
+    "Hyprland compositor (Omarchy Quattro Lua)"
     "Waybar status bar with window pill"
-    "Walker app launcher"
     "Tmux with C-Space prefix"
     "Zsh + Zinit + oh-my-posh"
     "Oh-My-Posh star prompt theme"
     "N Λ N O Emacs config"
     "Omarchy Vesper theme"
-    "Omarchy theme-set hook + walker template"
+    "Omarchy theme-set hook + Quattro menu extension"
 )
 
 # Selection state — 1 = selected, 0 = not. Default: all on.
@@ -107,15 +105,25 @@ install_nvim()     { _link "$DOTS/nvim"            "$HOME/.config/nvim"; }
 install_ghostty()  { _link "$DOTS/ghostty/config"  "$HOME/.config/ghostty/config"; }
 
 install_hypr() {
-    local f
-    for f in "$DOTS"/hypr/*.conf; do
+    local f dest target
+    mkdir -p "$HOME/.config/hypr"
+    for f in "$DOTS"/hypr/*.lua "$DOTS"/hypr/*.conf "$DOTS"/hypr/.luarc.json; do
+        [ -e "$f" ] || continue
         _link "$f" "$HOME/.config/hypr/$(basename "$f")"
+    done
+
+    # Pre-Quattro Hyprland read these .conf overrides. Quattro loads Lua.
+    for f in autostart.conf bindings.conf envs.conf hypridle.conf hyprland.conf hyprlock.conf input.conf looknfeel.conf monitors.conf; do
+        dest="$HOME/.config/hypr/$f"
+        [ -L "$dest" ] || continue
+        target="$(readlink -f "$dest" 2>/dev/null || true)"
+        if [ -z "$target" ] || [[ "$target" == "$DOTS"/hypr/* ]]; then
+            rm -f "$dest"
+        fi
     done
 }
 
 install_waybar() { _link "$DOTS/waybar/.config/waybar" "$HOME/.config/waybar"; }
-
-install_walker()   { _link "$DOTS/walker/config.toml"     "$HOME/.config/walker/config.toml"; }
 install_tmux()     { _link "$DOTS/tmux/tmux.conf"         "$HOME/.config/tmux/tmux.conf"; }
 
 install_zsh() {
@@ -147,13 +155,30 @@ install_nano() {
 
 install_vesper()   { _link "$DOTS/vesper" "$HOME/.config/omarchy/themes/vesper"; }
 
-# Omarchy glue: the theme-set hook (reloads tmux/nvim + regenerates Walker from
-# walker.css.tpl so third-party themes can't override your Walker style) and the
-# Walker template itself. Linked as individual files — never the whole omarchy/
-# dir, which Omarchy manages (current/, themes/, etc.).
+# Omarchy glue: the theme-set hook (reloads tmux/nvim) and the Quattro menu
+# extension. Linked as individual files — never the whole omarchy/ dir, which
+# Omarchy manages (current/, themes/, etc.).
 install_omarchy() {
-    _link "$DOTS/omarchy/hooks/theme-set"       "$HOME/.config/omarchy/hooks/theme-set"
-    _link "$DOTS/omarchy/themed/walker.css.tpl" "$HOME/.config/omarchy/themed/walker.css.tpl"
+    _link "$DOTS/omarchy/hooks/theme-set" \
+        "$HOME/.config/omarchy/hooks/theme-set"
+    _link "$DOTS/omarchy/extensions/omarchy-menu.jsonc" \
+        "$HOME/.config/omarchy/extensions/omarchy-menu.jsonc"
+    _link "$DOTS/omarchy/shell.toml" \
+        "$HOME/.config/omarchy/shell.toml"
+
+    # Quattro dropped Walker. Remove leftover dots-owned links from pre-4.0.
+    local dest target
+    for dest in \
+        "$HOME/.config/walker/config.toml" \
+        "$HOME/.config/omarchy/themed/walker.css.tpl"
+    do
+        [ -L "$dest" ] || continue
+        target="$(readlink -f "$dest" 2>/dev/null || true)"
+        if [ -z "$target" ] || [[ "$target" == "$DOTS"/* ]]; then
+            rm -f "$dest"
+        fi
+    done
+    rmdir "$HOME/.config/walker" 2>/dev/null || true
 
     # Wallpapers: omarchy-theme-bg-next looks for user backgrounds in
     # ~/.config/omarchy/backgrounds/<theme-slug>/ — one folder per theme, named
@@ -359,21 +384,26 @@ post_install() {
 
     if [ "$need_hypr" -eq 1 ] && command -v hyprctl >/dev/null 2>&1; then
         hyprctl reload >/dev/null 2>&1 && _ok "hyprland reloaded"
+        local hypr_errs
+        hypr_errs="$(hyprctl configerrors 2>/dev/null || true)"
+        if [ -n "$hypr_errs" ] && [ "$hypr_errs" != "ok" ]; then
+            _warn "hyprland configerrors:"
+            printf '%s\n' "$hypr_errs"
+        fi
     fi
 
     if [ "$need_waybar" -eq 1 ] && command -v omarchy-restart-waybar >/dev/null 2>&1; then
         omarchy-restart-waybar >/dev/null 2>&1 && _ok "waybar restarted"
     fi
 
-    # Run the theme-set hook once for the active theme so the Walker template
-    # applies immediately (regenerates walker.css), then restart Walker.
+    # Run the theme-set hook once for the active theme (tmux/nvim/cliamp).
+    # The Quattro menu extension hot-reloads on save; no Walker restart.
     if [ "$need_omarchy" -eq 1 ] && command -v omarchy-hook >/dev/null 2>&1; then
         local theme_name
         theme_name="$(cat "$HOME/.config/omarchy/current/theme.name" 2>/dev/null || true)"
         if [ -n "$theme_name" ]; then
             omarchy-hook theme-set "$theme_name" >/dev/null 2>&1 || true
-            command -v omarchy-restart-walker >/dev/null 2>&1 && omarchy-restart-walker >/dev/null 2>&1
-            _ok "walker template applied (theme: $theme_name)"
+            _ok "theme-set hook applied (theme: $theme_name)"
         fi
     fi
 

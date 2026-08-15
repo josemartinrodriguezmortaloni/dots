@@ -9,14 +9,13 @@ Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and mode
 | **nvim** | Neovim 0.11+ with vesper.nvim, blink.cmp, mini.nvim, treesitter, diffview |
 | **nano** | Emacs 30 — [N Λ N O](https://github.com/rougier/nano-emacs) look + capas propias: evil con leader `SPC`, eglot (Python/Rust/C++/TS), dape, org-agenda + nano-calendar, consult/embark, magit, vterm. Ver [nano/README.md](nano/README.md) |
 | **ghostty** | Ghostty terminal with Vesper colors, JetBrainsMono Nerd Font |
-| **hypr** | Hyprland compositor — keybindings, animations, dual monitor, NVIDIA |
+| **hypr** | Hyprland (Omarchy Quattro Lua) — overrides for monitors, input, look, cliamp |
 | **waybar** | Status bar with custom window pill, workspace indicators |
-| **walker** | App launcher config (style stays consistent across all themes) |
 | **tmux** | Tmux with C-Space prefix, vi mode, Vesper theme |
 | **zsh** | Zsh with Zinit, oh-my-posh (star theme), fzf-tab, syntax highlighting |
 | **ohmyposh** | Oh-My-Posh prompt theme |
 | **vesper** | Omarchy Vesper theme — Mellow base + Vesper accents (bdsqqq style) |
-| **omarchy** | Omarchy `theme-set` hook + Walker template (keeps your Walker style on every theme, reloads tmux/nvim) |
+| **omarchy** | `theme-set` hook (tmux/nvim), `shell.toml` (Walker look on the Quattro menu), `omarchy-menu.jsonc` |
 
 ## Color palette
 

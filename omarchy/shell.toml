@@ -1,0 +1,21 @@
+# Machine-level Omarchy shell override.
+# Port of the pre-Quattro Walker template (omarchy/themed/walker.css.tpl):
+# theme colors + transparent chrome, so third-party themes cannot restyle
+# the launcher. User keys win over the active theme's shell.toml.
+#
+# Corner radius is not a shell.toml token — the menu follows Hyprland
+# decoration.rounding (see hypr/looknfeel.lua).
+#
+# Do NOT set menu.text / menu.selected-text here. Color.qml's pick() feeds
+# those keys straight into a QML `color` property and does not resolve role
+# names — `text = "foreground"` becomes black. Omit them so they fall back
+# to colors.toml (foreground / accent), which tracks the active theme.
+
+[menu]
+background = "background"
+background-alpha = 1.0
+border = "transparent"
+border-alpha = 0
+border-width = 0
+selected-border = "transparent"
+selected-border-alpha = 0
