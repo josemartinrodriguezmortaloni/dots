@@ -18,6 +18,9 @@ return {
       win = "\u{f17a}",
       error = "\u{f057}",
       warn = "\u{f071}",
+      added = "\u{f457}",
+      changed = "\u{f459}",
+      removed = "\u{f458}",
     }
 
     local function section_os()
@@ -40,6 +43,29 @@ return {
         enc = vim.o.encoding
       end
       return enc
+    end
+
+    -- Resumen de gitsigns con un icono por tipo de cambio
+    local function section_diff()
+      if MiniStatusline.is_truncated(75) then
+        return ""
+      end
+      local summary = vim.b.gitsigns_status_dict
+      if not summary then
+        return ""
+      end
+      local parts = {}
+      for _, item in ipairs({
+        { icons.added, summary.added },
+        { icons.changed, summary.changed },
+        { icons.removed, summary.removed },
+      }) do
+        local n = item[2] or 0
+        if n > 0 then
+          parts[#parts + 1] = item[1] .. n
+        end
+      end
+      return table.concat(parts, " ")
     end
 
     -- Solo errores y warnings
@@ -73,21 +99,21 @@ return {
 
       local filename = "%t%m%r"
       local git = MiniStatusline.section_git({ trunc_width = 75 })
-      local diff = MiniStatusline.section_diff({ trunc_width = 75 })
+      local diff = section_diff()
       local diagnostics = section_diagnostics()
 
       local filetype = MiniStatusline.section_fileinfo({ trunc_width = math.huge })
       local os_name = section_os()
-      local encoding = section_encoding()
+      -- local encoding = section_encoding()
       local location = "%l:%v  %p%%"
 
       return MiniStatusline.combine_groups({
+        -- { hl = "MiniStatuslineFilename", strings = { mode } },
         { hl = mode_hl, strings = { mode } },
-        { hl = "MiniStatuslineFilename", strings = { filename } },
-        { hl = "MiniStatuslineDevinfo", strings = { git, diff, diagnostics } },
+        { hl = "MiniStatuslineDevinfo", strings = { filename, git, diff, diagnostics } },
         "%<",
         "%=",
-        { hl = "MiniStatuslineFileinfo", strings = { filetype, os_name, encoding } },
+        { hl = "MiniStatuslineFileinfo", strings = { filetype, os_name } },
         { hl = mode_hl, strings = { location } },
       })
     end
