@@ -5,20 +5,10 @@
 hl.env("GDK_SCALE", "1")
 
 hl.monitor({
-  output = "desc:Samsung Electric Company S24F350 HCNNA03791",
-  mode = "1920x1080@60.00",
-  position = "840x-480",
-  scale = 1,
-  transform = 5,
-  sdr_min_luminance = 0.2,
-  sdr_max_luminance = 80,
-})
-
-hl.monitor({
-  output = "desc:Samsung Electric Company S34CG50 HNBW800164",
-  mode = "3440x1440@100.00",
-  position = "1920x0",
-  scale = 1,
-  sdr_min_luminance = 0.2,
-  sdr_max_luminance = 80,
+	output = "eDP-1",
+	mode = "1920x1080@60.00",
+	position = "auto",
+	scale = 1,
+	sdr_min_luminance = 0.2,
+	sdr_max_luminance = 80,
 })
