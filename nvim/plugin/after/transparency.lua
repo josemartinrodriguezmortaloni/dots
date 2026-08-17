@@ -73,7 +73,8 @@ local groups = {
   "NotifyWARNBorder",
   "NotifyTRACEBorder",
   "NotifyDEBUGBorder",
-  "WhichKeyFloat",
+  "BufferLineTab",
+  "NvimTreeEndOfBuffer",
 }
 
 local function apply()
