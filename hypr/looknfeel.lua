@@ -6,6 +6,8 @@ hl.config({
 		border_size = 0,
 		allow_tearing = true,
 		resize_on_border = true,
+		gaps_in = 4,
+		gaps_out = 6,
 	},
 })
 

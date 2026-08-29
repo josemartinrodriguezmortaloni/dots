@@ -113,8 +113,8 @@ return {
         { hl = "MiniStatuslineDevinfo", strings = { filename, git, diff, diagnostics } },
         "%<",
         "%=",
-        { hl = "MiniStatuslineFileinfo", strings = { filetype, os_name } },
-        { hl = mode_hl, strings = { location } },
+        { hl = "MiniStatuslineFileinfo", strings = { os_name } },
+        { hl = mode_hl, strings = { filetype } },
       })
     end
 
