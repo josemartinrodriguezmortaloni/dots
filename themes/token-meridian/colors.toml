@@ -1,0 +1,37 @@
+# Token Meridian (dark). Surfaces come from the Token palette's bg0..bg5 and
+# fg0..fg3; every ANSI slot comes from contrib/ghostty/token-meridian-dark, so
+# waybar, btop and the rest match the terminal instead of drifting from it.
+mode = "dark"
+
+accent = "#e89a49"
+selection = "#3c3b36"
+muted = "#585855"
+
+background = "#272724"
+dark_background = "#212120"
+darker_background = "#181817"
+lighter_background = "#30302c"
+
+foreground = "#c9c0b1"
+dark_foreground = "#91887d"
+light_foreground = "#aba195"
+bright_foreground = "#c9c0b1"
+
+selection_background = "#3c3b36"
+selection_foreground = "#c9c0b1"
+
+red = "#db8935"
+yellow = "#d99148"
+orange = "#e89a49"
+green = "#8cbb62"
+cyan = "#66abc6"
+blue = "#66abc6"
+magenta = "#b991db"
+brown = "#c7792e"
+
+bright_red = "#ea9d49"
+bright_yellow = "#f8c88f"
+bright_green = "#8cbb62"
+bright_cyan = "#66abc6"
+bright_blue = "#66abc6"
+bright_magenta = "#de88a6"

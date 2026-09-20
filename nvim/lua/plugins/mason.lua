@@ -8,6 +8,7 @@ return {
         "stylua",
         "prettier",
         "clang-format",
+        "ty",
       })
     end,
   },

@@ -3,8 +3,8 @@
 -- Add any additional options here
 require("config.remote_clipboard").setup()
 
--- Prefer basedpyright (from Work/dots/nvim) over pyright
-vim.g.lazyvim_python_lsp = "basedpyright"
+-- Python: ty (type checker, Astral) + ruff (lint/format). Ver lua/plugins/lsp.lua
+vim.g.lazyvim_python_lsp = "ty"
 vim.g.autoformat = true
 
 local o = vim.o

@@ -15,3 +15,11 @@ nvim/*.log
 *.jpeg
 *.gif
 *.webp
+
+# ...except the wallpaper pool and the theme previews, which the Omarchy themes
+# need on every machine the repo is cloned to.
+!omarchy/backgrounds/**
+!themes/*/preview.png
+
+# Rust
+installer/target/

@@ -7,7 +7,6 @@ Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and mode
 | Config | Description |
 |--------|-------------|
 | **nvim** | Neovim 0.11+ with vesper.nvim, blink.cmp, mini.nvim, treesitter, diffview |
-| **nano** | Emacs 30 — [N Λ N O](https://github.com/rougier/nano-emacs) look + capas propias: evil con leader `SPC`, eglot (Python/Rust/C++/TS), dape, org-agenda + nano-calendar, consult/embark, magit, vterm. Ver [nano/README.md](nano/README.md) |
 | **ghostty** | Ghostty terminal with Vesper colors, JetBrainsMono Nerd Font |
 | **hypr** | Hyprland (Omarchy Quattro Lua) — overrides for monitors, input, look, cliamp |
 | **waybar** | Status bar with custom window pill, workspace indicators |
@@ -37,14 +36,24 @@ white   #A0A0A0           #ffffff
 
 ## Install
 
+Requires `cargo`: the installer is a Rust/ratatui TUI under [`installer/`](installer/) and
+`install.sh` only compiles and runs it. On Arch: `sudo pacman -S rust`.
+
 ```bash
 git clone https://github.com/josemartinrodriguezmortaloni/dots.git ~/Work/dots
 cd ~/Work/dots
 chmod +x install.sh
-./install.sh
+./install.sh            # TUI: pick modules, confirm, install
+./install.sh --all      # every module, no TUI
+./install.sh --help     # list the modules
 ```
 
-The installer creates symlinks from this repo to `~/.config/` and `~/`. Existing files are backed up to `~/.dotfiles-backup/<timestamp>/` before being replaced.
+The installer creates symlinks from this repo to `~/.config/` and `~/`. It shows every existing
+file it is about to displace and waits for confirmation; those files are moved to
+`~/.dotfiles-backup/<timestamp>/` before being replaced. Colors come from the active Omarchy
+theme via `omarchy-theme-color`, falling back to `themes/token-meridian/`.
+
+Run `installer/check.sh` to gate a change: tests, clippy and cyclomatic complexity.
 
 ## System
 
@@ -52,7 +61,7 @@ The installer creates symlinks from this repo to `~/.config/` and `~/`. Existing
 - **WM**: Hyprland (Wayland)
 - **Terminal**: Ghostty
 - **Shell**: Zsh + Zinit + oh-my-posh
-- **Editor**: Neovim 0.11+ / Emacs 30 (N Λ N O)
+- **Editor**: Neovim 0.11+
 - **Font**: JetBrainsMono Nerd Font
 - **GPU**: NVIDIA
 - **Monitors**: Ultrawide 3440x1440 + 1080p

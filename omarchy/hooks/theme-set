@@ -16,6 +16,36 @@ done
 cliamp_theme="$HOME/.config/waybar/scripts/cliamp-omarchy-theme.sh"
 [ -x "$cliamp_theme" ] && "$cliamp_theme" >/dev/null 2>&1
 
+# Obsidian reads the light or dark half of the Token Meridian theme from its own
+# appearance setting, so an Omarchy theme change only reaches it when that
+# setting moves with it. omarchy-theme-set-obsidian writes a separate theme
+# named "Omarchy" into each vault and never touches this field.
+declare -A OBSIDIAN_THEME=([dark]=obsidian [light]=moonstone)
+
+set_vault_theme() {
+  local appearance="$1/.obsidian/appearance.json" tmp
+  [ -f "$appearance" ] || return 0
+
+  tmp=$(mktemp)
+  jq --arg theme "$2" '.theme = $theme' "$appearance" >"$tmp" && mv "$tmp" "$appearance"
+}
+
+sync_obsidian_appearance() {
+  local colors="$HOME/.local/state/omarchy/current/theme/colors.toml"
+  local mode obsidian_theme vault
+
+  mode=$(sed -nE 's/^mode = "(dark|light)"$/\1/p' "$colors" 2>/dev/null)
+  obsidian_theme="${OBSIDIAN_THEME[$mode]:-}"
+  [ -n "$obsidian_theme" ] || return 0
+
+  jq -r '.vaults | values[].path' "$HOME/.config/obsidian/obsidian.json" 2>/dev/null |
+    while read -r vault; do
+      set_vault_theme "$vault" "$obsidian_theme"
+    done
+}
+
+sync_obsidian_appearance
+
 # >>> omazed hook - do not edit >>>
 omazed set "$1"
 # <<< omazed hook - do not edit <<<
