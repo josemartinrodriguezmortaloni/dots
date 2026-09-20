@@ -20,7 +20,9 @@ map("n", "<C-u>", "<C-u>zz")
 map("n", "n", "nzzzv")
 map("n", "N", "Nzzzv")
 
--- Terminal flotante (equivalente a <A-i> de la config vieja; usa Snacks)
-map({ "n", "t" }, "<A-i>", function()
-  Snacks.terminal()
-end, { desc = "Terminal flotante" })
+-- toggleterm es el motor único de terminales: los defaults de LazyVim
+-- seguirían abriendo instancias de Snacks.terminal en paralelo.
+pcall(vim.keymap.del, { "n", "t" }, "<c-/>")
+pcall(vim.keymap.del, { "n", "t" }, "<c-_>")
+pcall(vim.keymap.del, "n", "<leader>ft")
+pcall(vim.keymap.del, "n", "<leader>fT")
