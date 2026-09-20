@@ -96,8 +96,10 @@ end
 -- $HOME es un repo y dots/installer es un crate dentro de otro repo, así que
 -- LazyVim.root() apunta afuera del proyecto en ambos casos.
 local function start_dir()
+  -- filereadable y no `== ""`: los buffers de scratch traen nombres tipo
+  -- `ministarter://1/welcome`, que no son rutas pero tampoco están vacíos.
   local file = vim.api.nvim_buf_get_name(0)
-  if file == "" then
+  if vim.fn.filereadable(file) == 0 then
     return vim.fn.getcwd()
   end
   return vim.fs.dirname(file)
@@ -108,7 +110,8 @@ local function marker_root(marker, from)
   if not found then
     return nil
   end
-  return vim.fs.dirname(found)
+  -- `:p` fuerza ruta absoluta: vim.fs.find devuelve relativa si `from` no existe.
+  return vim.fs.dirname(vim.fn.fnamemodify(found, ":p"))
 end
 
 local function accepts(stack, root)
@@ -169,6 +172,8 @@ local ROLES = {
 local function on_open(term)
   vim.cmd("stopinsert")
   vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], { buffer = term.bufnr })
+  -- Cierre incondicional: la tecla del rol reejecuta cuando el proceso murió.
+  vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = term.bufnr })
 end
 
 local active = {}
