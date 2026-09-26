@@ -34,3 +34,7 @@ hl.config({
 -- Window-rule syntax: https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 -- o.window(".*", { tag = "-default-opacity" })
 -- o.window(".*", { opacity = "1 1" })
+
+-- A theme may ship its own looknfeel.lua (e.g. themes/industrial). Loaded last,
+-- it replaces the geometry above only while that theme is current.
+require("default.hypr.require_optional").module("omarchy.current.theme.looknfeel")

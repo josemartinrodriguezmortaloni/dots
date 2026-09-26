@@ -1,0 +1,15 @@
+{
+  "script python con main": {
+    "prefix": "pmain",
+    "body": [
+      "def main():",
+      "\t${1:print('Hello World')}",
+      "",
+      "",
+      "if __name__ == '__main__':",
+      "\tmain()",
+      "$0"
+    ],
+    "description": "estructura básica de un script en python"
+  }
+}

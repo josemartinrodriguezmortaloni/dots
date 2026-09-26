@@ -1,0 +1,12 @@
+{
+  "main con Result": {
+    "prefix": "rmain",
+    "body": [
+      "fn main() -> Result<(), Box<dyn std::error::Error>> {",
+      "\t$0",
+      "\tOk(())",
+      "}"
+    ],
+    "description": "main que propaga errores con ?"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "mis-snippets",
+  "contributes": {
+    "snippets": [
+      {
+        "language": [
+          "rust"
+        ],
+        "path": "./rust.json"
+      },
+      {
+        "language": [
+          "markdown",
+          "text"
+        ],
+        "path": "./prompts.json"
+      },
+      {
+        "language": [
+          "python"
+        ],
+        "path": "./python.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+# DESIGN.md §5.8 and §3.7: an opaque --panel with a 1 px --line border over an
+# 80 % --void scrim. The selected row is an inversion: --accent fill with
+# --on-accent text.
+[launcher]
+background                = "#262626"
+background-alpha          = 1.0
+text                      = "#d4d4d4"
+border                    = "#4a4a4a"
+border-alpha              = 1.0
+border-width              = 1
+scrim                     = "#1f1f1f"
+scrim-alpha               = 0.8
+selected-background       = "#ffffff"
+selected-background-alpha = 1.0
+selected-text             = "#1f1f1f"
+selected-border           = "#ffffff"
+selected-border-alpha     = 0

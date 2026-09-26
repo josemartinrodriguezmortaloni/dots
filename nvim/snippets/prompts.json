@@ -1,0 +1,152 @@
+{
+  "prompt": {
+    "prefix": "prompt",
+    "description": "Prompt completo: referencia, rol, instrucciones, datos ausentes, terminado, formato, ejemplos, tarea",
+    "body": [
+      "# ${1:NOMBRE_DEL_PROMPT}",
+      "",
+      "## Material de referencia",
+      "<!-- Opcional. Documentos, políticas, glosarios o datos fijos. Si es largo, va arriba de todo. -->",
+      "<referencia>",
+      "${2:MATERIAL_DE_REFERENCIA}",
+      "</referencia>",
+      "",
+      "## Rol y objetivo",
+      "<!-- Rol solo si cambia el comportamiento. El objetivo en 1-2 oraciones: qué resultado tiene que producir. -->",
+      "${3:ROL}",
+      "",
+      "${4:OBJETIVO}",
+      "",
+      "## Instrucciones",
+      "<!-- En positivo (qué hacer), una idea por ítem, con su motivo cuando lo sabés.",
+      "     Reemplazá adjetivos vagos (\"corto\", \"detallado\") por criterios verificables. -->",
+      "- ${5:INSTRUCCION}, porque ${6:MOTIVO}.",
+      "- ${7:INSTRUCCION}.",
+      "",
+      "## Datos ausentes",
+      "<!-- Obligatorio en tareas factuales, de extracción o sobre documentos. -->",
+      "Respondé solo con lo que figura en <referencia>. Si un dato no figura, escribí \"${8:VALOR_PARA_DATO_AUSENTE}\" en lugar de completarlo.",
+      "",
+      "## Criterio de terminado",
+      "<!-- Solo en tareas agénticas o de muchos pasos. Borrá esta sección si no aplica. -->",
+      "Terminado significa: ${9:CRITERIO_VERIFICABLE}.",
+      "",
+      "Cuando un paso no requiere mi intervención, seguí; poné las notas de estado en el mismo mensaje que la próxima acción. Pará y preguntá solo cuando no puedas continuar sin mí, o antes de algo destructivo: ${10:ACCIONES_DESTRUCTIVAS}.",
+      "",
+      "## Formato de salida",
+      "<!-- Contrato verificable: estructura, campos, tipos, longitud y qué emitir cuando falta un dato. -->",
+      "${11:FORMATO_DE_SALIDA}",
+      "",
+      "## Ejemplos",
+      "<!-- Mismo formato exacto entre ejemplos, contenido variado. 2-3 suelen alcanzar. -->",
+      "<example>",
+      "<entrada>${12:ENTRADA_EJEMPLO_1}</entrada>",
+      "<salida>${13:SALIDA_EJEMPLO_1}</salida>",
+      "</example>",
+      "",
+      "<example>",
+      "<entrada>${14:ENTRADA_EJEMPLO_2}</entrada>",
+      "<salida>${15:SALIDA_EJEMPLO_2}</salida>",
+      "</example>",
+      "",
+      "## Tarea",
+      "<!-- Siempre al final. Acá va el contenido que cambia en cada ejecución. -->",
+      "<entrada>",
+      "${16:ENTRADA}",
+      "</entrada>",
+      "",
+      "${17:PEDIDO_CONCRETO}$0"
+    ]
+  },
+  "prrol": {
+    "prefix": "prrol",
+    "description": "Rol en una oración (va en el parámetro system)",
+    "body": ["${1:ROL_EN_UNA_ORACION}$0"]
+  },
+  "prdocs": {
+    "prefix": "prdocs",
+    "description": "Bloque <documentos> con un documento (va arriba de todo)",
+    "body": [
+      "<documentos>",
+      "  <documento index=\"${1:1}\">",
+      "    <fuente>${2:NOMBRE_FUENTE}</fuente>",
+      "    <contenido>${3:CONTENIDO_DOCUMENTO}</contenido>",
+      "  </documento>$0",
+      "</documentos>"
+    ]
+  },
+  "prdoc": {
+    "prefix": "prdoc",
+    "description": "Un <documento> suelto para agregar dentro de <documentos>",
+    "body": [
+      "<documento index=\"${1:N}\">",
+      "  <fuente>${2:NOMBRE_FUENTE}</fuente>",
+      "  <contenido>${3:CONTENIDO_DOCUMENTO}</contenido>",
+      "</documento>$0"
+    ]
+  },
+  "prinst": {
+    "prefix": "prinst",
+    "description": "Bloque <instrucciones>: acción en positivo + motivo + salida sin dato",
+    "body": [
+      "<instrucciones>",
+      "1. ${1:ACCION_EN_POSITIVO}, porque ${2:MOTIVO}.",
+      "2. Usá solo la información de <documentos>.",
+      "3. Si el dato no figura en <documentos>, respondé exactamente: \"${3:FRASE_SIN_DATO}\".$0",
+      "</instrucciones>"
+    ]
+  },
+  "prpaso": {
+    "prefix": "prpaso",
+    "description": "Una instrucción numerada: acción en positivo + motivo",
+    "body": ["${1:N}. ${2:ACCION_EN_POSITIVO}, porque ${3:MOTIVO}.$0"]
+  },
+  "prnodato": {
+    "prefix": "prnodato",
+    "description": "Regla de salida válida cuando el dato no figura en el material",
+    "body": [
+      "Si el dato no figura en <${1:documentos}>, respondé exactamente: \"${2:FRASE_SIN_DATO}\".$0"
+    ]
+  },
+  "prfmt": {
+    "prefix": "prfmt",
+    "description": "Bloque <formato_salida> con criterio de aceptación verificable",
+    "body": [
+      "<formato_salida>",
+      "${1:ESTRUCTURA_DE_SALIDA}",
+      "Criterio de aceptación: ${2:CRITERIO_VERIFICABLE}",
+      "</formato_salida>$0"
+    ]
+  },
+  "prejs": {
+    "prefix": "prejs",
+    "description": "Bloque <ejemplos> con caso típico y caso borde",
+    "body": [
+      "<ejemplos>",
+      "  <ejemplo>",
+      "    <entrada>${1:ENTRADA_CASO_TIPICO}</entrada>",
+      "    <salida>${2:SALIDA_CASO_TIPICO}</salida>",
+      "  </ejemplo>",
+      "  <ejemplo>",
+      "    <entrada>${3:ENTRADA_CASO_BORDE}</entrada>",
+      "    <salida>${4:SALIDA_CASO_BORDE}</salida>",
+      "  </ejemplo>$0",
+      "</ejemplos>"
+    ]
+  },
+  "prej": {
+    "prefix": "prej",
+    "description": "Un <ejemplo> suelto para agregar dentro de <ejemplos>",
+    "body": [
+      "<ejemplo>",
+      "  <entrada>${1:ENTRADA_EJEMPLO}</entrada>",
+      "  <salida>${2:SALIDA_EJEMPLO}</salida>",
+      "</ejemplo>$0"
+    ]
+  },
+  "prtarea": {
+    "prefix": "prtarea",
+    "description": "Bloque <tarea> (va al final del prompt)",
+    "body": ["<tarea>", "${1:PREGUNTA_O_TAREA}", "</tarea>$0"]
+  }
+}

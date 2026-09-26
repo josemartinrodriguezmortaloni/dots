@@ -1,0 +1,17 @@
+# DESIGN.md §5.5 and §6, monochrome: an opaque --panel-2 field whose border
+# brightens with urgency. Idle is --ink-700 (the 3:1 control boundary of
+# §3.3), typing is --ink-300 (the hover contour of §6), and a wrong password
+# is --accent, the brightest grey, which colors.toml gives to errors.
+[lock]
+background       = "#303030"
+background-alpha = 1.0
+text             = "#d4d4d4"
+placeholder      = "#9a9a9a"
+text-error       = "#ffffff"
+border           = "#707070"
+border-active    = "#b0b0b0"
+border-error     = "#ffffff"
+border-alpha     = 1.0
+border-width     = 1
+selection        = "#ffffff"
+selection-alpha  = 0.45

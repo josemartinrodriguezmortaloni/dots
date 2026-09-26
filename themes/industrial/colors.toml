@@ -1,0 +1,61 @@
+# Industrial: the tokens of DESIGN.md §3.1 mapped onto Omarchy's palette,
+# fully monochrome. Every colour is a neutral grey (chroma 0): DESIGN.md's
+# --red-600 and --amber-500 are left out on purpose.
+#
+# Without hue, a signal is told apart by luminance: the more urgent the
+# signal, the brighter the grey. Error (red) takes --accent, warning and
+# progress (yellow, orange) take --accent-press, success (green) sits one
+# step below the text. Every text grey keeps 4.5:1 or more on --void
+# (DESIGN.md §3.3), so nothing here is darker than --ink-500 except brown and
+# muted, which carry no readings.
+#
+#   #1f1f1f --void         background, and both darker shades: §3.7 forbids
+#                          anything darker than the canvas
+#   #262626 --panel        lighter_background
+#   #3a3a3a --ink-900      selection (Neovim Visual, LSP references)
+#   #4a4a4a --line         selection_background, inactive window border
+#   #707070 --ink-700      muted (comments, ghost text), brown
+#   #9a9a9a --ink-500      dark_foreground, blue
+#   #b0b0b0 --ink-300      light_foreground, green, cyan
+#   #c8c8c8 --accent-press yellow, orange, magenta
+#   #d4d4d4 --ink-100      foreground
+#   #ffffff --accent       accent, cursor, red
+#
+# selection_background is --line and not a white inversion: VS Code and
+# Obsidian lay unchanged --ink-100 text over it, which a white fill hides.
+mode = "dark"
+
+accent = "#ffffff"
+selection = "#3a3a3a"
+muted = "#707070"
+
+background = "#1f1f1f"
+dark_background = "#1f1f1f"
+darker_background = "#1f1f1f"
+lighter_background = "#262626"
+
+foreground = "#d4d4d4"
+dark_foreground = "#9a9a9a"
+light_foreground = "#b0b0b0"
+bright_foreground = "#ffffff"
+
+selection_background = "#4a4a4a"
+selection_foreground = "#ffffff"
+
+red = "#ffffff"
+yellow = "#c8c8c8"
+orange = "#c8c8c8"
+green = "#b0b0b0"
+cyan = "#b0b0b0"
+blue = "#9a9a9a"
+magenta = "#c8c8c8"
+brown = "#707070"
+
+bright_red = "#ffffff"
+bright_yellow = "#d4d4d4"
+bright_green = "#d4d4d4"
+bright_cyan = "#c8c8c8"
+bright_blue = "#b0b0b0"
+bright_magenta = "#d4d4d4"
+
+hyprland_inactive_border = "#4a4a4a"

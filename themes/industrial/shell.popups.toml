@@ -1,0 +1,8 @@
+# DESIGN.md §5.8: a floating --panel with a 1 px --line border.
+[popups]
+background       = "#262626"
+background-alpha = 1.0
+text             = "#d4d4d4"
+border           = "#4a4a4a"
+border-alpha     = 1.0
+border-width     = 1
