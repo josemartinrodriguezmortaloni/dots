@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use jiff::Zoned;
 
+use crate::machine::Machine;
+
 const STAMP: &str = "%Y%m%d-%H%M%S";
 
 /// Rutas del dominio. `install.sh` exporta `DOTS_ROOT` porque el bootstrap es
@@ -14,22 +16,27 @@ pub struct Dots {
     root: PathBuf,
     home: PathBuf,
     backup: PathBuf,
+    machine: Machine,
 }
 
 impl Dots {
     pub fn from_env() -> Result<Self> {
+        Self::located(Machine::from_env()?)
+    }
+
+    fn located(machine: Machine) -> Result<Self> {
         let root = required("DOTS_ROOT")?;
         let home = required("HOME")?;
         let backup = home.join(".dotfiles-backup").join(stamp());
 
-        Ok(Self { root, home, backup })
+        Ok(Self { root, home, backup, machine })
     }
 
     #[cfg(test)]
-    pub fn at(root: PathBuf, home: PathBuf) -> Self {
+    pub fn at(root: PathBuf, home: PathBuf, machine: Machine) -> Self {
         let backup = home.join(".dotfiles-backup");
 
-        Self { root, home, backup }
+        Self { root, home, backup, machine }
     }
 
     pub fn repo(&self, rel: &str) -> PathBuf {
@@ -50,6 +57,10 @@ impl Dots {
 
     pub fn backup(&self) -> &Path {
         &self.backup
+    }
+
+    pub fn machine(&self) -> Machine {
+        self.machine
     }
 }
 

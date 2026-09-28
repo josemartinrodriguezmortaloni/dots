@@ -31,9 +31,14 @@ pub const MODULES: [Module; 10] = [
 const VSCODE_EXT: &str = ".vscode/extensions/thorstenrhau.token-vscode-themes-0.0.0";
 const CURSOR_FLAG: &str = ".local/state/omarchy/toggles/skip-cursor-theme-changes";
 
+/// `hyprland.lua` carga `hypr.monitors`: el perfil del equipo elegido se enlaza
+/// con este nombre y los demás perfiles de `hypr/` no se enlazan.
+const MONITORS: &str = "monitors.lua";
+
 /// Hyprland anterior a Quattro leía estos `.conf`; Quattro carga Lua. Los
-/// enlaces que dejó una instalación vieja de este repo se retiran.
-const HYPR_LEGACY: [&str; 8] = [
+/// enlaces que dejó una instalación vieja de este repo se retiran, igual que el
+/// perfil de escritorio que antes se enlazaba con su propio nombre.
+const HYPR_LEGACY: [&str; 9] = [
     "autostart.conf",
     "bindings.conf",
     "envs.conf",
@@ -42,6 +47,7 @@ const HYPR_LEGACY: [&str; 8] = [
     "hyprlock.conf",
     "input.conf",
     "looknfeel.conf",
+    "monitors-esc.lua",
 ];
 
 /// Lo único de `~/.claude` que escribe el usuario. El resto del directorio es
@@ -112,13 +118,20 @@ fn hypr(dots: &Dots) -> Result<Vec<Op>> {
         .map(|src| link_into(src, &target))
         .collect();
 
+    ops.push(link(
+        dots.repo("hypr").join(dots.machine().monitors()),
+        target.join(MONITORS),
+    ));
     ops.extend(stale_overrides(dots, &target));
 
     Ok(ops)
 }
 
 fn hypr_sources(dir: &Path) -> Result<Vec<PathBuf>> {
-    let mut found: Vec<PathBuf> = entries(dir)?.into_iter().filter(|p| is_hypr_source(p)).collect();
+    let mut found: Vec<PathBuf> = entries(dir)?
+        .into_iter()
+        .filter(|p| is_hypr_source(p) && !is_monitor_profile(p))
+        .collect();
     found.sort();
 
     Ok(found)
@@ -126,6 +139,10 @@ fn hypr_sources(dir: &Path) -> Result<Vec<PathBuf>> {
 
 fn is_hypr_source(path: &Path) -> bool {
     matches!(extension(path), "lua" | "conf") || file_name(path) == ".luarc.json"
+}
+
+fn is_monitor_profile(path: &Path) -> bool {
+    file_name(path).starts_with("monitors")
 }
 
 fn stale_overrides(dots: &Dots, target: &Path) -> Vec<Op> {
@@ -311,6 +328,7 @@ fn file_name(path: &Path) -> &str {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::machine::Machine;
     use tempfile::TempDir;
 
     fn claude_repo() -> (TempDir, Dots) {
@@ -319,9 +337,69 @@ mod tests {
         fs::create_dir_all(skills.join("locality")).expect("skill");
         fs::write(skills.join("README.md"), "").expect("file");
 
-        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"));
+        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"), Machine::Notebook);
 
         (dir, dots)
+    }
+
+    fn hypr_repo(machine: Machine) -> (TempDir, Dots) {
+        let dir = TempDir::new().expect("tempdir");
+        let hypr = dir.path().join("repo/hypr");
+        fs::create_dir_all(&hypr).expect("hypr");
+
+        for name in ["hyprland.lua", "monitors.lua", "monitors-esc.lua"] {
+            fs::write(hypr.join(name), "").expect("file");
+        }
+
+        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"), machine);
+
+        (dir, dots)
+    }
+
+    fn links(ops: &[Op]) -> Vec<(PathBuf, PathBuf)> {
+        ops.iter()
+            .filter_map(|op| match op {
+                Op::Link { src, dest } => Some((src.clone(), dest.clone())),
+                _ => None,
+            })
+            .collect()
+    }
+
+    fn monitors_source(machine: Machine) -> Vec<PathBuf> {
+        let (_dir, dots) = hypr_repo(machine);
+        let dest = dots.home(".config/hypr").join(MONITORS);
+
+        links(&hypr(&dots).expect("plan"))
+            .into_iter()
+            .filter(|(_, d)| *d == dest)
+            .map(|(src, _)| src.strip_prefix(dots.root()).expect("repo").to_owned())
+            .collect()
+    }
+
+    #[test]
+    fn hypr_links_desktop_profile_as_monitors() {
+        assert_eq!(
+            monitors_source(Machine::Desktop),
+            [PathBuf::from("hypr/monitors-esc.lua")]
+        );
+    }
+
+    #[test]
+    fn hypr_links_notebook_profile_as_monitors() {
+        assert_eq!(
+            monitors_source(Machine::Notebook),
+            [PathBuf::from("hypr/monitors.lua")]
+        );
+    }
+
+    #[test]
+    fn hypr_does_not_link_profiles_by_their_own_name() {
+        let (_dir, dots) = hypr_repo(Machine::Desktop);
+
+        let found = dests(&hypr(&dots).expect("plan"));
+
+        assert!(found.contains(&dots.home(".config/hypr/hyprland.lua")));
+        assert!(!found.contains(&dots.home(".config/hypr/monitors-esc.lua")));
     }
 
     fn dests(ops: &[Op]) -> Vec<PathBuf> {

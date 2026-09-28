@@ -6,6 +6,7 @@ mod dots;
 mod hooks;
 mod layout;
 mod link;
+mod machine;
 mod ops;
 mod plan;
 mod report;
