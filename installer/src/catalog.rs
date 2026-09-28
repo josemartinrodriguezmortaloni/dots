@@ -15,7 +15,7 @@ pub struct Module {
     pub plan: fn(&Dots) -> Result<Vec<Op>>,
 }
 
-pub const MODULES: [Module; 9] = [
+pub const MODULES: [Module; 10] = [
     Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
     Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
     Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
@@ -25,6 +25,7 @@ pub const MODULES: [Module; 9] = [
     Module { key: "ohmyposh", desc: "Prompt oh-my-posh, tema star",                plan: ohmyposh },
     Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
+    Module { key: "claude",   desc: "Claude Code: CLAUDE.md, settings y skills",   plan: claude },
 ];
 
 const VSCODE_EXT: &str = ".vscode/extensions/thorstenrhau.token-vscode-themes-0.0.0";
@@ -41,6 +42,17 @@ const HYPR_LEGACY: [&str; 8] = [
     "hyprlock.conf",
     "input.conf",
     "looknfeel.conf",
+];
+
+/// Lo único de `~/.claude` que escribe el usuario. El resto del directorio es
+/// estado que Claude Code gestiona solo: credenciales, sesiones y plugins.
+const CLAUDE_CONFIG: [&str; 6] = [
+    "CLAUDE.md",
+    "settings.json",
+    "statusline.sh",
+    "hooks",
+    "output-styles",
+    "rules",
 ];
 
 /// Quattro sacó Walker: estos destinos quedaron huérfanos en instalaciones
@@ -172,6 +184,24 @@ fn omarchy(dots: &Dots) -> Result<Vec<Op>> {
     Ok(ops)
 }
 
+/// Cada skill se enlaza por su nombre: `~/.claude/skills` también guarda las
+/// skills que instalan Omarchy, `npx skills` y claude.ai, y ésas no son del repo.
+fn claude(dots: &Dots) -> Result<Vec<Op>> {
+    let target = dots.home(".claude");
+    let mut ops: Vec<Op> = CLAUDE_CONFIG
+        .iter()
+        .map(|name| link_into(dots.repo("claude").join(name), &target))
+        .collect();
+
+    ops.extend(
+        dirs(&dots.repo("claude/skills"))?
+            .into_iter()
+            .map(|skill| link_into(skill, &target.join("skills"))),
+    );
+
+    Ok(ops)
+}
+
 fn walker_leftovers(dots: &Dots) -> Vec<Op> {
     WALKER_LEFTOVERS
         .iter()
@@ -276,4 +306,52 @@ fn extension(path: &Path) -> &str {
 
 fn file_name(path: &Path) -> &str {
     path.file_name().and_then(|name| name.to_str()).unwrap_or("")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    fn claude_repo() -> (TempDir, Dots) {
+        let dir = TempDir::new().expect("tempdir");
+        let skills = dir.path().join("repo/claude/skills");
+        fs::create_dir_all(skills.join("locality")).expect("skill");
+        fs::write(skills.join("README.md"), "").expect("file");
+
+        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"));
+
+        (dir, dots)
+    }
+
+    fn dests(ops: &[Op]) -> Vec<PathBuf> {
+        ops.iter()
+            .filter_map(|op| match op {
+                Op::Link { dest, .. } => Some(dest.clone()),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn claude_links_each_config_entry_into_dot_claude() {
+        let (_dir, dots) = claude_repo();
+
+        let found = dests(&claude(&dots).expect("plan"));
+
+        for name in CLAUDE_CONFIG {
+            assert!(found.contains(&dots.home(".claude").join(name)), "{name}");
+        }
+    }
+
+    #[test]
+    fn claude_links_skill_directories_one_by_one() {
+        let (_dir, dots) = claude_repo();
+
+        let found = dests(&claude(&dots).expect("plan"));
+
+        assert!(found.contains(&dots.home(".claude/skills/locality")));
+        assert!(!found.contains(&dots.home(".claude/skills/README.md")));
+        assert!(!found.contains(&dots.home(".claude/skills")));
+    }
 }

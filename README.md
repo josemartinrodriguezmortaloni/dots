@@ -15,6 +15,7 @@ Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and mode
 | **ohmyposh** | Oh-My-Posh prompt theme |
 | **vesper** | Omarchy Vesper theme — Mellow base + Vesper accents (bdsqqq style) |
 | **omarchy** | `theme-set` hook (tmux/nvim), `shell.toml` (Walker look on the Quattro menu), `omarchy-menu.jsonc` |
+| **claude** | Claude Code global config: `CLAUDE.md`, `settings.json`, statusline, Bash guard hook, output styles, rules and own skills |
 
 ## Color palette
 

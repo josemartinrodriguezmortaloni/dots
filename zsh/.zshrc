@@ -224,3 +224,4 @@ make-module() {
   # Cambia al directorio destino y ejecuta el CLI instalado mediante uv
   (cd "$target_path" && uv run dddpython -p "$module_name")
 }
+export PI_SHELL_ACP_CODEX_MODE=auto

@@ -1,17 +1,17 @@
-# DESIGN.md §5.5 and §6, monochrome: an opaque --panel-2 field whose border
-# brightens with urgency. Idle is --ink-700 (the 3:1 control boundary of
-# §3.3), typing is --ink-300 (the hover contour of §6), and a wrong password
-# is --accent, the brightest grey, which colors.toml gives to errors.
+# DESIGN.md §5.5 and §6: an opaque --panel-2 field. Idle is an --ink-700
+# contour (the 3:1 boundary of §3.3), typing is the --accent focus contour, and
+# a wrong password turns the border --red-600. The error text stays --ink-100:
+# §3.3 never sets a message in red, which reads 4.3:1 on --panel-2.
 [lock]
 background       = "#303030"
 background-alpha = 1.0
 text             = "#d4d4d4"
 placeholder      = "#9a9a9a"
-text-error       = "#ffffff"
+text-error       = "#d4d4d4"
 border           = "#707070"
-border-active    = "#b0b0b0"
-border-error     = "#ffffff"
+border-active    = "#ffffff"
+border-error     = "#e96d66"
 border-alpha     = 1.0
 border-width     = 1
 selection        = "#ffffff"
-selection-alpha  = 0.45
+selection-alpha  = 0.35

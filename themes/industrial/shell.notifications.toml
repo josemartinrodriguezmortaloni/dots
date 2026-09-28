@@ -1,4 +1,5 @@
-# DESIGN.md §5.14: a --panel-2 strip with a 1 px --line border.
+# DESIGN.md §5.14: a --panel-2 strip with a 1 px --line border. The countdown
+# is a progress bar, so it takes --accent (§3.2).
 # omarchy-theme-set-templates swaps this whole section into shell.toml, so every
 # key of the section is listed. Values are literal: this file is not a template.
 [notifications]

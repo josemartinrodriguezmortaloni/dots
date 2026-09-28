@@ -52,4 +52,5 @@ render_preview() {
 render_preview "$THEMES_DIR/token-meridian" "Token Meridian"
 render_preview "$THEMES_DIR/token-meridian-light" "Token Meridian Light"
 render_preview "$THEMES_DIR/industrial" "Industrial"
+render_preview "$THEMES_DIR/neobrutalism" "Neobrutalism"
 echo "previews written"

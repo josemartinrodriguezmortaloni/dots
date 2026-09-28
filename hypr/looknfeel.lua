@@ -3,37 +3,34 @@
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#general
 hl.config({
 	general = {
-		border_size = 0,
 		allow_tearing = true,
 		resize_on_border = true,
-		gaps_in = 4,
-		gaps_out = 6,
+
+		border_size = 3,
+		gaps_in = 5, -- mayor que el offset de la sombra
+		gaps_out = 10,
 	},
 })
 
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#decoration
 hl.config({
 	decoration = {
-		rounding = 12,
-		rounding_power = 2,
-		active_opacity = 1.0,
-		inactive_opacity = 1.0,
+		rounding = 0,
+		blur = { enabled = false },
 		shadow = {
 			enabled = true,
-			range = 4,
-			render_power = 3,
+			sharp = true,
+			range = 2,
+			offset = { 6, 6 },
 			color = "rgba(1a1a1aee)",
-		},
-		blur = {
-			enabled = false,
 		},
 	},
 })
 
 -- Override Omarchy default opacity rules — no transparency.
 -- Window-rule syntax: https://wiki.hypr.land/Configuring/Basics/Window-Rules/
--- o.window(".*", { tag = "-default-opacity" })
--- o.window(".*", { opacity = "1 1" })
+o.window(".*", { tag = "-default-opacity" })
+o.window(".*", { opacity = "1 1" })
 
 -- A theme may ship its own looknfeel.lua (e.g. themes/industrial). Loaded last,
 -- it replaces the geometry above only while that theme is current.

@@ -1,13 +1,11 @@
-# Industrial: the tokens of DESIGN.md §3.1 mapped onto Omarchy's palette,
-# fully monochrome. Every colour is a neutral grey (chroma 0): DESIGN.md's
-# --red-600 and --amber-500 are left out on purpose.
+# Industrial: the tokens of DESIGN.md §3.1 mapped onto Omarchy's palette.
+# Greys are neutral (chroma 0). The only hues are DESIGN.md's two signals,
+# --red-600 for errors and --amber-500 for progress and warnings (§3.2).
+# Blue, the usual accent slot, takes --accent: white marks selection, links
+# and focus.
 #
-# Without hue, a signal is told apart by luminance: the more urgent the
-# signal, the brighter the grey. Error (red) takes --accent, warning and
-# progress (yellow, orange) take --accent-press, success (green) sits one
-# step below the text. Every text grey keeps 4.5:1 or more on --void
-# (DESIGN.md §3.3), so nothing here is darker than --ink-500 except brown and
-# muted, which carry no readings.
+# Every text colour keeps 4.5:1 or more on --void (DESIGN.md §3.3), so nothing
+# here is darker than --ink-500 except brown and muted, which carry no readings.
 #
 #   #1f1f1f --void         background, and both darker shades: §3.7 forbids
 #                          anything darker than the canvas
@@ -15,11 +13,13 @@
 #   #3a3a3a --ink-900      selection (Neovim Visual, LSP references)
 #   #4a4a4a --line         selection_background, inactive window border
 #   #707070 --ink-700      muted (comments, ghost text), brown
-#   #9a9a9a --ink-500      dark_foreground, blue
+#   #9a9a9a --ink-500      dark_foreground
 #   #b0b0b0 --ink-300      light_foreground, green, cyan
-#   #c8c8c8 --accent-press yellow, orange, magenta
+#   #c8c8c8 --accent-press magenta
 #   #d4d4d4 --ink-100      foreground
-#   #ffffff --accent       accent, cursor, red
+#   #ffffff --accent       accent, cursor, blue
+#   #e96d66 --red-600      red
+#   #d9974a --amber-500    yellow, orange
 #
 # selection_background is --line and not a white inversion: VS Code and
 # Obsidian lay unchanged --ink-100 text over it, which a white fill hides.
@@ -42,20 +42,20 @@ bright_foreground = "#ffffff"
 selection_background = "#4a4a4a"
 selection_foreground = "#ffffff"
 
-red = "#ffffff"
-yellow = "#c8c8c8"
-orange = "#c8c8c8"
+red = "#e96d66"
+yellow = "#d9974a"
+orange = "#d9974a"
 green = "#b0b0b0"
 cyan = "#b0b0b0"
-blue = "#9a9a9a"
+blue = "#ffffff"
 magenta = "#c8c8c8"
 brown = "#707070"
 
-bright_red = "#ffffff"
-bright_yellow = "#d4d4d4"
+bright_red = "#e96d66"
+bright_yellow = "#d9974a"
 bright_green = "#d4d4d4"
 bright_cyan = "#c8c8c8"
-bright_blue = "#b0b0b0"
+bright_blue = "#ffffff"
 bright_magenta = "#d4d4d4"
 
 hyprland_inactive_border = "#4a4a4a"

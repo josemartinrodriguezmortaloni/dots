@@ -25,6 +25,13 @@ impl Dots {
         Ok(Self { root, home, backup })
     }
 
+    #[cfg(test)]
+    pub fn at(root: PathBuf, home: PathBuf) -> Self {
+        let backup = home.join(".dotfiles-backup");
+
+        Self { root, home, backup }
+    }
+
     pub fn repo(&self, rel: &str) -> PathBuf {
         self.root.join(rel)
     }
