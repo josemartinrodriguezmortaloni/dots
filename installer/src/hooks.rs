@@ -8,12 +8,17 @@ type Hook = fn(&Path) -> Vec<String>;
 /// Omarchy Quattro lo movió y la ruta vieja ya no existe.
 const THEME_NAME: &str = ".local/state/omarchy/current/theme.name";
 
-const HOOKS: [(&str, Hook); 5] = [
+/// El módulo `claude` enlaza este archivo; el script de plugins vive a su lado
+/// en el repo, así que el enlace resuelto dice dónde encontrarlo.
+const CLAUDE_SETTINGS: &str = ".claude/settings.json";
+
+const HOOKS: [(&str, Hook); 6] = [
     ("hypr", reload_hyprland),
     ("waybar", restart_waybar),
     ("omarchy", apply_theme_hook),
     ("zsh", shell_hint),
     ("tmux", shell_hint),
+    ("claude", sync_plugins),
 ];
 
 /// Efectos que sólo tienen sentido después de que los enlaces existen.
@@ -81,4 +86,21 @@ fn theme_name(home: &Path) -> Option<String> {
 
 fn shell_hint(_home: &Path) -> Vec<String> {
     vec!["abrí una terminal nueva para tomar los cambios de zsh/tmux".to_owned()]
+}
+
+fn sync_plugins(home: &Path) -> Vec<String> {
+    let Some(script) = plugins_script(home) else {
+        return Vec::new();
+    };
+
+    match sh::quiet("bash", &[&script.to_string_lossy()]) {
+        true => vec!["plugins de Claude Code sincronizados".to_owned()],
+        false => vec![format!("{} falló: correlo a mano para ver el detalle", script.display())],
+    }
+}
+
+fn plugins_script(home: &Path) -> Option<std::path::PathBuf> {
+    let settings = std::fs::canonicalize(home.join(CLAUDE_SETTINGS)).ok()?;
+
+    sh::has_command("claude").then(|| settings.with_file_name("plugins.sh"))
 }
