@@ -1,0 +1,6 @@
+[Unit]
+Description=Commit local de las notas de la bóveda Obsidian
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/obsidian-autocommit

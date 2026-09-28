@@ -15,7 +15,7 @@ pub struct Module {
     pub plan: fn(&Dots) -> Result<Vec<Op>>,
 }
 
-pub const MODULES: [Module; 10] = [
+pub const MODULES: [Module; 11] = [
     Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
     Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
     Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
@@ -26,6 +26,7 @@ pub const MODULES: [Module; 10] = [
     Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
     Module { key: "claude",   desc: "Claude Code: CLAUDE.md, settings y skills",   plan: claude },
+    Module { key: "obsidian", desc: "Commit local de la bóveda cada 15 minutos",   plan: obsidian },
 ];
 
 const VSCODE_EXT: &str = ".vscode/extensions/thorstenrhau.token-vscode-themes-0.0.0";
@@ -217,6 +218,21 @@ fn claude(dots: &Dots) -> Result<Vec<Op>> {
     );
 
     Ok(ops)
+}
+
+/// Sólo la mecánica de versionado vive en el repo: `dots` es público y la
+/// bóveda, con sus notas, se queda en `~/Documents/Obsidian`.
+fn obsidian(dots: &Dots) -> Result<Vec<Op>> {
+    let units = dots.home(".config/systemd/user");
+
+    Ok(vec![
+        link(
+            dots.repo("obsidian/autocommit.sh"),
+            dots.home(".local/bin/obsidian-autocommit"),
+        ),
+        link_into(dots.repo("obsidian/obsidian-autocommit.service"), &units),
+        link_into(dots.repo("obsidian/obsidian-autocommit.timer"), &units),
+    ])
 }
 
 fn walker_leftovers(dots: &Dots) -> Vec<Op> {
@@ -420,6 +436,19 @@ mod tests {
         for name in CLAUDE_CONFIG {
             assert!(found.contains(&dots.home(".claude").join(name)), "{name}");
         }
+    }
+
+    #[test]
+    fn obsidian_links_the_script_and_units_but_not_the_vault() {
+        let (_dir, dots) = claude_repo();
+        let units = dots.home(".config/systemd/user");
+
+        let found = dests(&obsidian(&dots).expect("plan"));
+
+        assert!(found.contains(&dots.home(".local/bin/obsidian-autocommit")));
+        assert!(found.contains(&units.join("obsidian-autocommit.service")));
+        assert!(found.contains(&units.join("obsidian-autocommit.timer")));
+        assert!(!found.contains(&dots.home("Documents/Obsidian")));
     }
 
     #[test]

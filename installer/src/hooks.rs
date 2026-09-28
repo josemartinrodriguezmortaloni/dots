@@ -12,13 +12,16 @@ const THEME_NAME: &str = ".local/state/omarchy/current/theme.name";
 /// en el repo, así que el enlace resuelto dice dónde encontrarlo.
 const CLAUDE_SETTINGS: &str = ".claude/settings.json";
 
-const HOOKS: [(&str, Hook); 6] = [
+const AUTOCOMMIT_TIMER: &str = "obsidian-autocommit.timer";
+
+const HOOKS: [(&str, Hook); 7] = [
     ("hypr", reload_hyprland),
     ("waybar", restart_waybar),
     ("omarchy", apply_theme_hook),
     ("zsh", shell_hint),
     ("tmux", shell_hint),
     ("claude", sync_plugins),
+    ("obsidian", enable_autocommit),
 ];
 
 /// Efectos que sólo tienen sentido después de que los enlaces existen.
@@ -103,4 +106,16 @@ fn plugins_script(home: &Path) -> Option<std::path::PathBuf> {
     let settings = std::fs::canonicalize(home.join(CLAUDE_SETTINGS)).ok()?;
 
     sh::has_command("claude").then(|| settings.with_file_name("plugins.sh"))
+}
+
+/// systemd no ve una unit nueva hasta recargar, y `enable --now` la arranca
+/// sin esperar al próximo login.
+fn enable_autocommit(_home: &Path) -> Vec<String> {
+    let enabled = sh::quiet("systemctl", &["--user", "daemon-reload"])
+        && sh::quiet("systemctl", &["--user", "enable", "--now", AUTOCOMMIT_TIMER]);
+
+    match enabled {
+        true => vec![format!("{AUTOCOMMIT_TIMER} activo")],
+        false => vec![format!("no se pudo activar {AUTOCOMMIT_TIMER}")],
+    }
 }

@@ -16,6 +16,7 @@ Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and mode
 | **vesper** | Omarchy Vesper theme — Mellow base + Vesper accents (bdsqqq style) |
 | **omarchy** | `theme-set` hook (tmux/nvim), `shell.toml` (Walker look on the Quattro menu), `omarchy-menu.jsonc` |
 | **claude** | Claude Code global config: `CLAUDE.md`, `settings.json`, statusline, Bash guard hook, output styles, rules and own skills |
+| **obsidian** | systemd timer that commits the text of the local vault `~/Documents/Obsidian` every 15 min; the vault itself stays out of this repo |
 
 ## Color palette
 
