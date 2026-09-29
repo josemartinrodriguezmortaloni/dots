@@ -1,40 +1,42 @@
 # dotfiles
 
-Personal dotfiles for Arch Linux (Omarchy) with Hyprland, Vesper theme, and modern CLI tools.
+Personal dotfiles for Arch Linux (Omarchy Quattro) with Hyprland. Terminal, editor, bar and
+multiplexer take their colors from the active Omarchy theme, so switching the theme recolors
+everything.
 
-## What's included
+## Modules
 
-| Config | Description |
-|--------|-------------|
-| **nvim** | Neovim 0.11+ with vesper.nvim, blink.cmp, mini.nvim, treesitter, diffview |
-| **ghostty** | Ghostty terminal with Vesper colors, JetBrainsMono Nerd Font |
-| **hypr** | Hyprland (Omarchy Quattro Lua) — overrides for monitors, input, look, cliamp |
-| **waybar** | Status bar with custom window pill, workspace indicators |
-| **tmux** | Tmux with C-Space prefix, vi mode, Vesper theme |
-| **zsh** | Zsh with Zinit, oh-my-posh (star theme), fzf-tab, syntax highlighting |
-| **ohmyposh** | Oh-My-Posh prompt theme |
-| **vesper** | Omarchy Vesper theme — Mellow base + Vesper accents (bdsqqq style) |
-| **omarchy** | `theme-set` hook (tmux/nvim), `shell.toml` (Walker look on the Quattro menu), `omarchy-menu.jsonc` |
-| **claude** | Claude Code global config: `CLAUDE.md`, `settings.json`, statusline, Bash guard hook, output styles, rules and own skills |
-| **obsidian** | systemd timer that commits the text of the local vault `~/Documents/Obsidian` every 15 min; the vault itself stays out of this repo |
+Each module is a set of symlinks from this repo to `~/`. Pick them in the installer TUI.
 
-## Color palette
+| Module | Links | Notes |
+|--------|-------|-------|
+| **nvim** | `~/.config/nvim` | Neovim 0.11+: blink.cmp, mini.nvim, treesitter, snacks, toggleterm; hot-reloads the Omarchy theme |
+| **ghostty** | `~/.config/ghostty/config` | Colors come from the active theme's `ghostty.conf` |
+| **hypr** | `~/.config/hypr/*.lua`, `*.conf` | Omarchy Quattro Lua overrides; the monitor profile depends on the machine (see [Install](#install)) |
+| **waybar** | `~/.config/waybar` | Custom window pill, workspace indicators, cliamp status |
+| **tmux** | `~/.config/tmux/tmux.conf` | C-Space prefix, vi mode |
+| **zsh** | `~/.zshrc`, `~/.zshenv` | Zinit, fzf-tab, syntax highlighting |
+| **ohmyposh** | `~/.config/ohmyposh/star.omp.json` | Prompt theme `star` |
+| **themes** | `~/.config/omarchy/themes/*` | Omarchy themes (see [Themes](#themes)) and the matching VS Code extension |
+| **omarchy** | `~/.config/omarchy/{hooks,extensions,shell.toml}` | `theme-set` hook (tmux/nvim), Quattro menu look, wallpaper pool shared by every theme |
+| **claude** | `~/.claude/{CLAUDE.md,settings.json,…}` | Claude Code global config and own skills; installs the plugins declared in `settings.json` |
+| **obsidian** | `~/.local/bin/obsidian-autocommit`, systemd user units | Timer that commits the text of the local vault `~/Documents/Obsidian` every 15 min |
 
-Based on [bdsqqq's Mellow + Vesper hybrid](https://bedes.qui.gg/writing/macos-rice):
+`zed/` holds the Zed settings, keymap and themes; the installer does not link it.
 
-```
-bg: #101010    fg: #ffffff    accent: #FFC799
+The Obsidian vault is not in this repo: this repo is public and the notes are private. Only the
+versioning mechanism lives here. The vault's git repo is local, has no remote, and tracks only
+text (`.md`, `.canvas`, `.base`, `.excalidraw`, `.puml`, `.obsidian/`); `obsidian/autocommit.sh`
+holds that list.
 
-Normal                    Bright
-black   #101010           #7E7E7E
-red     #f5a191           #ff8080
-green   #90b99f           #99FFE4
-yellow  #e6b99d           #FFC799
-blue    #aca1cf           #b9aeda
-magenta #e29eca           #ecaad6
-cyan    #ea83a5           #f591b2
-white   #A0A0A0           #ffffff
-```
+## Themes
+
+| Theme | Source |
+|-------|--------|
+| `token-meridian`, `token-meridian-light` | [Token](https://github.com/ThorstenRhau/token) by ThorstenRhau. `themes/sync-token.sh` re-copies the upstream files at the commit pinned in `themes/TOKEN_VERSION`; edit Token, never the copies |
+| `industrial` | Instrumental brutalism from SimPlant: neutral greys, red for errors, amber for progress. Spec in [`themes/industrial/DESIGN.md`](themes/industrial/DESIGN.md) |
+
+`themes/make-preview.sh` regenerates each theme's `preview.png`.
 
 ## Install
 
@@ -44,18 +46,32 @@ Requires `cargo`: the installer is a Rust/ratatui TUI under [`installer/`](insta
 ```bash
 git clone https://github.com/josemartinrodriguezmortaloni/dots.git ~/Work/dots
 cd ~/Work/dots
-chmod +x install.sh
-./install.sh            # TUI: pick modules, confirm, install
-./install.sh --all      # every module, no TUI
-./install.sh --help     # list the modules
+./install.sh                          # asks the machine, then the TUI
+./install.sh --help                   # list the modules
+DOTS_MACHINE=desktop ./install.sh --all   # every module, no questions
 ```
 
-The installer creates symlinks from this repo to `~/.config/` and `~/`. It shows every existing
-file it is about to displace and waits for confirmation; those files are moved to
-`~/.dotfiles-backup/<timestamp>/` before being replaced. Colors come from the active Omarchy
-theme via `omarchy-theme-color`, falling back to `themes/token-meridian/`.
+`install.sh` asks which machine it runs on, because only the monitor layout differs. The answer
+picks the profile linked as `~/.config/hypr/monitors.lua`. Export `DOTS_MACHINE` to skip the
+question.
 
-Run `installer/check.sh` to gate a change: tests, clippy and cyclomatic complexity.
+| `DOTS_MACHINE` | Profile | Monitors |
+|----------------|---------|----------|
+| `desktop` | `hypr/monitors-esc.lua` | Samsung 3440x1440@100 + Samsung 1080p rotated |
+| `notebook` | `hypr/monitors.lua` | Internal panel `eDP-1` 1080p |
+
+The installer shows every existing file it is about to displace and waits for confirmation; those
+files are moved to `~/.dotfiles-backup/<timestamp>/` before being replaced. After linking it runs
+each installed module's hook: reload Hyprland, restart Waybar, apply the `theme-set` hook, install
+the Claude Code plugins, and enable the Obsidian timer.
+
+## Development
+
+| Command | Checks |
+|---------|--------|
+| `installer/check.sh` | Installer tests, clippy, cyclomatic complexity < 4 |
+| `bash claude/hooks/test-guard-bash.sh` | Bash guard hook for Claude Code |
+| `bash obsidian/test-autocommit.sh` | Vault autocommit on a temporary repo |
 
 ## System
 
@@ -64,6 +80,4 @@ Run `installer/check.sh` to gate a change: tests, clippy and cyclomatic complexi
 - **Terminal**: Ghostty
 - **Shell**: Zsh + Zinit + oh-my-posh
 - **Editor**: Neovim 0.11+
-- **Font**: JetBrainsMono Nerd Font
-- **GPU**: NVIDIA
-- **Monitors**: Ultrawide 3440x1440 + 1080p
+- **GPU**: NVIDIA GeForce RTX 2060 SUPER (desktop)
