@@ -16,7 +16,7 @@ pub struct Dots {
     root: PathBuf,
     home: PathBuf,
     backup: PathBuf,
-    machine: Machine,
+    machine: Option<Machine>,
 }
 
 impl Dots {
@@ -24,7 +24,7 @@ impl Dots {
         Self::located(Machine::from_env()?)
     }
 
-    fn located(machine: Machine) -> Result<Self> {
+    fn located(machine: Option<Machine>) -> Result<Self> {
         let root = required("DOTS_ROOT")?;
         let home = required("HOME")?;
         let backup = home.join(".dotfiles-backup").join(stamp());
@@ -33,7 +33,7 @@ impl Dots {
     }
 
     #[cfg(test)]
-    pub fn at(root: PathBuf, home: PathBuf, machine: Machine) -> Self {
+    pub fn at(root: PathBuf, home: PathBuf, machine: Option<Machine>) -> Self {
         let backup = home.join(".dotfiles-backup");
 
         Self { root, home, backup, machine }
@@ -59,8 +59,13 @@ impl Dots {
         &self.backup
     }
 
-    pub fn machine(&self) -> Machine {
+    pub fn machine(&self) -> Result<Machine> {
         self.machine
+            .context("falta elegir el equipo: exportá DOTS_MACHINE (desktop | notebook)")
+    }
+
+    pub fn choose(&mut self, machine: Machine) {
+        self.machine = Some(machine);
     }
 }
 

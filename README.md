@@ -39,12 +39,12 @@ cd ~/Work/dots
 
 ## Get started
 
-`install.sh` asks which machine it runs on, then opens the TUI to pick modules:
+`install.sh` opens the TUI: it asks which machine it runs on, then lets you pick modules:
 
 ```bash
-./install.sh                              # machine question, then the TUI
+./install.sh                              # TUI: machine question, then modules
 ./install.sh --help                       # list the modules
-DOTS_MACHINE=desktop ./install.sh --all   # every module, no questions
+DOTS_MACHINE=desktop ./install.sh --all   # every module, no questions; DOTS_MACHINE is required
 ```
 
 After linking, the installer runs the hook of each installed module: reload Hyprland, restart Waybar, apply the `theme-set` hook, install the Claude Code plugins, and enable the Obsidian timer.
@@ -71,7 +71,7 @@ Each module is a set of symlinks from this repo to `~/`.
 
 ## Machines
 
-The answer to the machine question picks the profile linked as `~/.config/hypr/monitors.lua`. Export `DOTS_MACHINE` to skip the question.
+The answer to the machine question picks the profile linked as `~/.config/hypr/monitors.lua`. Export `DOTS_MACHINE` to skip the question; `--all` requires it.
 
 | `DOTS_MACHINE` | Profile                 | Monitors                                      |
 | -------------- | ----------------------- | --------------------------------------------- |

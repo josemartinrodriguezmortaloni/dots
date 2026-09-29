@@ -1,10 +1,10 @@
 use std::env;
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Result, bail};
 
 /// El equipo destino. Sólo cambia la disposición de monitores: el resto de la
-/// configuración es idéntica en ambos. `install.sh` lo pregunta y lo exporta en
-/// `DOTS_MACHINE`.
+/// configuración es idéntica en ambos. La TUI lo pregunta; `DOTS_MACHINE` evita
+/// la pregunta y es obligatorio en `--all`, que corre sin terminal.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Machine {
     Desktop,
@@ -12,10 +12,12 @@ pub enum Machine {
 }
 
 impl Machine {
-    pub fn from_env() -> Result<Self> {
-        let value = env::var("DOTS_MACHINE").context("falta la variable de entorno DOTS_MACHINE")?;
+    /// Orden de las opciones en la pantalla de elección.
+    pub const ALL: [Machine; 2] = [Machine::Desktop, Machine::Notebook];
 
-        Self::parse(&value)
+    /// `None` si la variable no está exportada: el equipo queda por elegir.
+    pub fn from_env() -> Result<Option<Self>> {
+        env::var("DOTS_MACHINE").ok().map(|value| Self::parse(&value)).transpose()
     }
 
     fn parse(value: &str) -> Result<Self> {
@@ -23,6 +25,13 @@ impl Machine {
             "desktop" => Ok(Machine::Desktop),
             "notebook" => Ok(Machine::Notebook),
             other => bail!("DOTS_MACHINE inválido: {other} (desktop | notebook)"),
+        }
+    }
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Machine::Desktop => "pc de escritorio",
+            Machine::Notebook => "notebook",
         }
     }
 

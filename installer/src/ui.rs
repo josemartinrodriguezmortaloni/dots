@@ -10,12 +10,14 @@ use crate::app::{App, Confirm, MENU, Run, Screen};
 use crate::catalog::MODULES;
 use crate::donut;
 use crate::layout;
+use crate::machine::Machine;
 use crate::theme::Palette;
 use crate::worker::Summary;
 
 const BANNER: &str = include_str!("banner.txt");
 const MAX_DISPLACED: usize = 6;
 const RUNNING_HINT: &str = "instalando…";
+const MACHINE_QUESTION: &str = "¿En qué equipo se instala la configuración?";
 
 pub fn draw(frame: &mut Frame, app: &App) {
     let areas = layout::split(frame.area());
@@ -71,6 +73,7 @@ fn banner(palette: &Palette) -> Paragraph<'static> {
 
 fn body(frame: &mut Frame, app: &App, area: Rect) {
     match &app.screen {
+        Screen::Machine { cursor } => frame.render_widget(machines(*cursor, &app.palette), area),
         Screen::Menu { cursor } => frame.render_widget(menu(*cursor, &app.palette), area),
         Screen::Select { cursor } => frame.render_widget(modules(app, *cursor), area),
         Screen::Confirm(confirm) => frame.render_widget(confirmation(confirm, &app.palette), area),
@@ -78,6 +81,22 @@ fn body(frame: &mut Frame, app: &App, area: Rect) {
         Screen::Report(summary) => frame.render_widget(report(summary, &app.palette), area),
         Screen::Done => {}
     }
+}
+
+fn machines(cursor: usize, palette: &Palette) -> Paragraph<'static> {
+    let mut lines = vec![
+        Line::styled(MACHINE_QUESTION, Style::new().fg(palette.foreground)),
+        Line::raw(""),
+    ];
+
+    lines.extend(
+        Machine::ALL
+            .iter()
+            .enumerate()
+            .map(|(index, machine)| option(index == cursor, machine.label().to_owned(), palette)),
+    );
+
+    Paragraph::new(lines)
 }
 
 fn menu(cursor: usize, palette: &Palette) -> Paragraph<'static> {
@@ -292,7 +311,7 @@ fn hints(screen: &Screen, palette: &Palette) -> Paragraph<'static> {
 
 fn hint_text(screen: &Screen) -> &'static str {
     match screen {
-        Screen::Menu { .. } => "↑/↓ mover · enter elegir · q salir",
+        Screen::Machine { .. } | Screen::Menu { .. } => "↑/↓ mover · enter elegir · q salir",
         Screen::Select { .. } => {
             "↑/↓ mover · espacio marcar · a todos · n ninguno · enter seguir · esc volver"
         }

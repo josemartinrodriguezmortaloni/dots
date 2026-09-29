@@ -9,6 +9,7 @@ use crate::catalog::MODULES;
 use crate::donut::Donut;
 use crate::dots::Dots;
 use crate::link::Backup;
+use crate::machine::Machine;
 use crate::plan::Plan;
 use crate::theme::{self, Palette};
 use crate::worker::{self, Progress, Summary};
@@ -21,6 +22,7 @@ const ABORT: KeyCode = KeyCode::Null;
 pub const MENU: [&str; 3] = ["Instalar todos los módulos", "Elegir módulos", "Cancelar"];
 
 pub enum Screen {
+    Machine { cursor: usize },
     Menu { cursor: usize },
     Select { cursor: usize },
     Confirm(Confirm),
@@ -72,7 +74,7 @@ impl App {
         let palette = theme::load(&dots);
 
         Self {
-            screen: Screen::Menu { cursor: 0 },
+            screen: first_screen(&dots),
             donut: Donut::new(),
             palette,
             picked: vec![true; MODULES.len()],
@@ -111,11 +113,32 @@ impl App {
         }
 
         match screen {
+            Screen::Machine { cursor } => self.machine(cursor, key),
             Screen::Menu { cursor } => self.menu(cursor, key),
             Screen::Select { cursor } => self.select(cursor, key),
             Screen::Confirm(confirm) => self.confirm(confirm, key),
             other => Ok(dismiss(other, key)),
         }
+    }
+
+    fn machine(&mut self, cursor: usize, key: Option<KeyCode>) -> Result<Screen> {
+        let Some(code) = key else {
+            return Ok(Screen::Machine { cursor });
+        };
+
+        match code {
+            KeyCode::Enter => Ok(self.settle_machine(cursor)),
+            KeyCode::Esc | KeyCode::Char('q') => Ok(Screen::Done),
+            other => Ok(Screen::Machine {
+                cursor: moved(cursor, Machine::ALL.len(), other),
+            }),
+        }
+    }
+
+    fn settle_machine(&mut self, cursor: usize) -> Screen {
+        self.dots.choose(Machine::ALL[cursor]);
+
+        Screen::Menu { cursor: 0 }
     }
 
     fn menu(&mut self, cursor: usize, key: Option<KeyCode>) -> Result<Screen> {
@@ -259,6 +282,14 @@ impl App {
             Some(summary) => Screen::Report(summary),
             None => Screen::Running(run),
         }
+    }
+}
+
+/// Con `DOTS_MACHINE` exportado la pregunta ya tiene respuesta.
+fn first_screen(dots: &Dots) -> Screen {
+    match dots.machine() {
+        Ok(_) => Screen::Menu { cursor: 0 },
+        Err(_) => Screen::Machine { cursor: 0 },
     }
 }
 

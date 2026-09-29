@@ -120,7 +120,7 @@ fn hypr(dots: &Dots) -> Result<Vec<Op>> {
         .collect();
 
     ops.push(link(
-        dots.repo("hypr").join(dots.machine().monitors()),
+        dots.repo("hypr").join(dots.machine()?.monitors()),
         target.join(MONITORS),
     ));
     ops.extend(stale_overrides(dots, &target));
@@ -353,12 +353,12 @@ mod tests {
         fs::create_dir_all(skills.join("locality")).expect("skill");
         fs::write(skills.join("README.md"), "").expect("file");
 
-        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"), Machine::Notebook);
+        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"), Some(Machine::Notebook));
 
         (dir, dots)
     }
 
-    fn hypr_repo(machine: Machine) -> (TempDir, Dots) {
+    fn hypr_repo(machine: Option<Machine>) -> (TempDir, Dots) {
         let dir = TempDir::new().expect("tempdir");
         let hypr = dir.path().join("repo/hypr");
         fs::create_dir_all(&hypr).expect("hypr");
@@ -382,10 +382,15 @@ mod tests {
     }
 
     fn monitors_source(machine: Machine) -> Vec<PathBuf> {
-        let (_dir, dots) = hypr_repo(machine);
+        let (_dir, dots) = hypr_repo(Some(machine));
+
+        monitors_of(&dots)
+    }
+
+    fn monitors_of(dots: &Dots) -> Vec<PathBuf> {
         let dest = dots.home(".config/hypr").join(MONITORS);
 
-        links(&hypr(&dots).expect("plan"))
+        links(&hypr(dots).expect("plan"))
             .into_iter()
             .filter(|(_, d)| *d == dest)
             .map(|(src, _)| src.strip_prefix(dots.root()).expect("repo").to_owned())
@@ -410,12 +415,24 @@ mod tests {
 
     #[test]
     fn hypr_does_not_link_profiles_by_their_own_name() {
-        let (_dir, dots) = hypr_repo(Machine::Desktop);
+        let (_dir, dots) = hypr_repo(Some(Machine::Desktop));
 
         let found = dests(&hypr(&dots).expect("plan"));
 
         assert!(found.contains(&dots.home(".config/hypr/hyprland.lua")));
         assert!(!found.contains(&dots.home(".config/hypr/monitors-esc.lua")));
+    }
+
+    #[test]
+    fn hypr_fails_until_a_machine_is_chosen() {
+        let (_dir, mut dots) = hypr_repo(None);
+        assert!(hypr(&dots).is_err());
+
+        dots.choose(Machine::Notebook);
+        assert_eq!(
+            monitors_of(&dots),
+            [PathBuf::from("hypr/monitors.lua")]
+        );
     }
 
     fn dests(ops: &[Op]) -> Vec<PathBuf> {
