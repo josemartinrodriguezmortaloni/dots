@@ -225,3 +225,4 @@ make-module() {
   (cd "$target_path" && uv run dddpython -p "$module_name")
 }
 export PI_SHELL_ACP_CODEX_MODE=auto
+export CLAUDE_CODE_EXECUTABLE="$HOME/.local/bin/claude"

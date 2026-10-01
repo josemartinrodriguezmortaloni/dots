@@ -4,11 +4,6 @@
 
 hl.env("GDK_SCALE", "1")
 
-hl.monitor({
-	output = "eDP-1",
-	mode = "1920x1080@60.00",
-	position = "auto",
-	scale = 1,
-	sdr_min_luminance = 0.2,
-	sdr_max_luminance = 80,
-})
+-- Keep this rule on one line: omarchy-hyprland-monitor-clamshell (run on every
+-- screensaver wake) parses it line by line and falls back to scale 2 otherwise.
+hl.monitor({ output = "eDP-1", mode = "1920x1080@60.00", position = "auto", scale = 1, sdr_min_luminance = 0.2, sdr_max_luminance = 80 })
