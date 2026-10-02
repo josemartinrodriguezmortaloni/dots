@@ -15,7 +15,7 @@ pub struct Module {
     pub plan: fn(&Dots) -> Result<Vec<Op>>,
 }
 
-pub const MODULES: [Module; 11] = [
+pub const MODULES: [Module; 12] = [
     Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
     Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
     Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
@@ -27,6 +27,7 @@ pub const MODULES: [Module; 11] = [
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
     Module { key: "pi",       desc: "Pi: AGENTS.md, settings, MCP, extensiones y skills", plan: pi },
     Module { key: "obsidian", desc: "Commit local de la bóveda cada 15 minutos",   plan: obsidian },
+    Module { key: "mise",     desc: "Herramientas globales con mise (claude, pi…)", plan: mise },
 ];
 
 const VSCODE_EXT: &str = ".vscode/extensions/thorstenrhau.token-vscode-themes-0.0.0";
@@ -116,6 +117,15 @@ fn zsh(dots: &Dots) -> Result<Vec<Op>> {
         link(dots.repo("zsh/.zshrc"), dots.home(".zshrc")),
         link(dots.repo("zsh/.zshenv"), dots.home(".zshenv")),
     ])
+}
+
+/// mise instala `claude` en la misma ruta en todos los equipos, y
+/// `CLAUDE_CODE_EXECUTABLE` en `.zshrc` depende de esa ruta.
+fn mise(dots: &Dots) -> Result<Vec<Op>> {
+    Ok(vec![link(
+        dots.repo("mise/config.toml"),
+        dots.home(".config/mise/config.toml"),
+    )])
 }
 
 fn ohmyposh(dots: &Dots) -> Result<Vec<Op>> {
@@ -520,6 +530,15 @@ mod tests {
         assert!(!removed.contains(&claude.join("skills/foreign")));
         assert!(!removed.contains(&claude.join(".credentials.json")));
         assert!(!removed.contains(&dots.home(CLAUDE_SETTINGS)));
+    }
+
+    #[test]
+    fn mise_links_the_global_config() {
+        let (_dir, dots) = pi_repo();
+
+        let found = dests(&mise(&dots).expect("plan"));
+
+        assert_eq!(found, [dots.home(".config/mise/config.toml")]);
     }
 
     #[test]

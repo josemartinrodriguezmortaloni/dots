@@ -10,13 +10,14 @@ const THEME_NAME: &str = ".local/state/omarchy/current/theme.name";
 
 const AUTOCOMMIT_TIMER: &str = "obsidian-autocommit.timer";
 
-const HOOKS: [(&str, Hook); 6] = [
+const HOOKS: [(&str, Hook); 7] = [
     ("hypr", reload_hyprland),
     ("waybar", restart_waybar),
     ("omarchy", apply_theme_hook),
     ("zsh", shell_hint),
     ("tmux", shell_hint),
     ("obsidian", enable_autocommit),
+    ("mise", install_tools),
 ];
 
 /// Efectos que sólo tienen sentido después de que los enlaces existen.
@@ -80,6 +81,19 @@ fn theme_name(home: &Path) -> Option<String> {
     let name = raw.trim().to_owned();
 
     (!name.is_empty()).then_some(name)
+}
+
+/// Enlazar la config no instala nada: sin `mise install` las rutas de
+/// `~/.local/share/mise/installs` no existen en un equipo nuevo.
+fn install_tools(_home: &Path) -> Vec<String> {
+    if !sh::has_command("mise") {
+        return vec!["mise no está instalado: las herramientas de mise/config.toml quedan pendientes".to_owned()];
+    }
+
+    match sh::quiet("mise", &["install"]) {
+        true => vec!["herramientas de mise instaladas".to_owned()],
+        false => vec!["mise install falló: correlo a mano para ver el detalle".to_owned()],
+    }
 }
 
 fn shell_hint(_home: &Path) -> Vec<String> {

@@ -47,7 +47,7 @@ cd ~/Work/dots
 DOTS_MACHINE=desktop ./install.sh --all   # every module, no questions; DOTS_MACHINE is required
 ```
 
-After linking, the installer runs the hook of each installed module: reload Hyprland, restart Waybar, apply the `theme-set` hook, and enable the Obsidian timer.
+After linking, the installer runs the hook of each installed module: reload Hyprland, restart Waybar, apply the `theme-set` hook, enable the Obsidian timer, and run `mise install`.
 
 ## Modules
 
@@ -66,6 +66,7 @@ Each module is a set of symlinks from this repo to `~/`.
 | **omarchy**  | `~/.config/omarchy/{hooks,extensions,shell.toml}`      | `theme-set` hook (tmux/nvim), Quattro menu look, wallpaper pool shared by every theme             |
 | **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,skills/*,extensions/*}`, `~/.claude/settings.json` | Pi instructions, packages, MCP servers, own skills, the `guard` and `usage` extensions; Claude Code settings with the claude.ai-synced plugins off; removes the old `~/.claude` links |
 | **obsidian** | `~/.local/bin/obsidian-autocommit`, systemd user units | Timer that commits the text of the local vault `~/Documents/Obsidian` every 15 min                |
+| **mise**     | `~/.config/mise/config.toml`                           | Global tools (claude, codex, gh, node, pi); runs `mise install` so every machine gets the same paths |
 
 `zed/` holds the Zed settings, keymap and themes; the installer does not link it.
 
