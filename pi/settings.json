@@ -1,0 +1,56 @@
+{
+  "defaultModel": "opus",
+  "defaultProvider": "claude-acp",
+  "lastChangelogVersion": "1.0.0",
+  "npmCommand": [
+    "mise",
+    "exec",
+    "node@24.21.0",
+    "--",
+    "npm"
+  ],
+  "packages": [
+    "npm:gentle-engram@0.1.16",
+    "npm:pi-mcp-adapter",
+    {
+      "source": "../../Work/pp/ccp/pi-claude-acp",
+      "extensions": [
+        "+src/index.ts"
+      ]
+    },
+    "npm:@upstash/context7-pi@0.1.2",
+    "npm:@alasano/pi-linear",
+    "../../Work/pp/ccp/pi-markdown-rendering",
+    "../../Work/pp/ccp/pi-codesanbox-execution"
+  ],
+  "theme": "omarchy-system",
+  "compaction": {
+    "enabled": false
+  },
+  "transport": "auto",
+  "markdown": {
+    "mermaid": "streaming"
+  },
+  "tuiMode": "fullscreen",
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "enableInstallTelemetry": false,
+  "defaultProjectTrust": "ask",
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "default",
+  "warnings": {
+    "anthropicExtraUsage": true
+  },
+  "modelThinkingLevels": {
+    "claude-acp/opus": "high",
+    "claude-acp/default": "high"
+  },
+  "defaultThinkingLevel": "high",
+  "defaultTools": [
+    "+codemode"
+  ],
+  "extensions": [
+    "-builtin:mcp"
+  ]
+}

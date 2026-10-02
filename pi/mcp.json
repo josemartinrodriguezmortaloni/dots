@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "engram": {
+      "args": [
+        "mcp",
+        "--tools=agent"
+      ],
+      "command": "/home/linuxbrew/.linuxbrew/bin/engram"
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@4.1.1"
+      ]
+    }
+  }
+}

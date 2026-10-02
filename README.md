@@ -11,14 +11,14 @@
  ⠈⠻⢿⣿⣿⣿⠿⠋⢾⣿⣿⠇⠀⠀⠀⠘⠻⠿⠛⠀
 ```
 
-dots is the configuration of my Arch Linux machines: Hyprland on Omarchy Quattro, Neovim, Ghostty, tmux and Zsh, plus Claude Code and a timer that versions my Obsidian vault. A Rust installer links each module into `~/` and backs up every file it replaces. Terminal, editor, bar and multiplexer read their colors from the active Omarchy theme.
+dots is the configuration of my Arch Linux machines: Hyprland on Omarchy Quattro, Neovim, Ghostty, tmux and Zsh, plus the Pi coding agent and a timer that versions my Obsidian vault. A Rust installer links each module into `~/` and backs up every file it replaces. Terminal, editor, bar and multiplexer read their colors from the active Omarchy theme.
 
 ## Highlights
 
 - **One theme switch:** Ghostty, Neovim, tmux and Waybar follow the active Omarchy theme; Neovim reloads it live
 - **Safe installer:** a Rust/ratatui TUI that lists every file it displaces and moves it to `~/.dotfiles-backup/<timestamp>/`
 - **Per machine:** desktop and notebook share everything except the monitor layout
-- **Agents and notes:** Claude Code config with plugin sync, and a local git timer for the Obsidian vault
+- **Agents and notes:** Pi config with a command guard and a usage status, and a local git timer for the Obsidian vault
 
 <p>
   <a href="https://archlinux.org"><img alt="Arch Linux" src="https://img.shields.io/badge/ARCH-LINUX-0a0a0a.svg?style=for-the-badge&amp;logo=archlinux&amp;labelColor=000000" height="28"></a>
@@ -47,7 +47,7 @@ cd ~/Work/dots
 DOTS_MACHINE=desktop ./install.sh --all   # every module, no questions; DOTS_MACHINE is required
 ```
 
-After linking, the installer runs the hook of each installed module: reload Hyprland, restart Waybar, apply the `theme-set` hook, install the Claude Code plugins, and enable the Obsidian timer.
+After linking, the installer runs the hook of each installed module: reload Hyprland, restart Waybar, apply the `theme-set` hook, and enable the Obsidian timer.
 
 ## Modules
 
@@ -64,7 +64,7 @@ Each module is a set of symlinks from this repo to `~/`.
 | **ohmyposh** | `~/.config/ohmyposh/star.omp.json`                     | Prompt theme `star`                                                                               |
 | **themes**   | `~/.config/omarchy/themes/*`                           | Omarchy themes and the matching VS Code extension                                                 |
 | **omarchy**  | `~/.config/omarchy/{hooks,extensions,shell.toml}`      | `theme-set` hook (tmux/nvim), Quattro menu look, wallpaper pool shared by every theme             |
-| **claude**   | `~/.claude/{CLAUDE.md,settings.json,…}`                | Claude Code global config and own skills; installs the plugins declared in `settings.json`        |
+| **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,skills/*,extensions/*}` | Pi instructions, packages, MCP servers, own skills, the `guard` and `usage` extensions; removes the old `~/.claude` links |
 | **obsidian** | `~/.local/bin/obsidian-autocommit`, systemd user units | Timer that commits the text of the local vault `~/Documents/Obsidian` every 15 min                |
 
 `zed/` holds the Zed settings, keymap and themes; the installer does not link it.
@@ -95,11 +95,12 @@ The vault is not in this repo: this repo is public and the notes are private. On
 
 Gate every change before a commit:
 
-| Command                                | Checks                                             |
-| -------------------------------------- | -------------------------------------------------- |
-| `installer/check.sh`                   | Installer tests, clippy, cyclomatic complexity < 4 |
-| `bash claude/hooks/test-guard-bash.sh` | Bash guard hook for Claude Code                    |
-| `bash obsidian/test-autocommit.sh`     | Vault autocommit on a temporary repo               |
+| Command                                              | Checks                                             |
+| ---------------------------------------------------- | -------------------------------------------------- |
+| `installer/check.sh`                                 | Installer tests, clippy, cyclomatic complexity < 4 |
+| `bash pi/extensions/guard/test-guard-bash.sh`        | Shell risk rules of the Pi guard                   |
+| `node --test pi/extensions/*/*.test.ts`              | Pi `guard` votes and `usage` status (Node 24+)     |
+| `bash obsidian/test-autocommit.sh`                   | Vault autocommit on a temporary repo               |
 
 ## System
 

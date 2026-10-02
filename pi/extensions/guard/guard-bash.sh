@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# guard-bash.sh — Hook PreToolUse para la herramienta Bash de Claude Code.
+# guard-bash.sh — Reglas de riesgo para comandos de shell. Lo invoca la extensión
+# guard de Pi (policy.ts) para su herramienta bash, su herramienta read y las de Claude Code.
 #
 # Lee por stdin el JSON del evento, extrae .tool_input.command y lo evalúa contra
 # clases de comandos peligrosos. Si detecta riesgo, sale con código 2 (BLOQUEA y
@@ -14,7 +15,8 @@
 #     escondido en un compuesto (`ls && rm -rf .`).
 #   - Única dependencia externa: jq. El resto son builtins de bash.
 #
-# Contrato Claude Code: exit 2 => deny + stderr al modelo. exit 0 => allow.
+# Contrato (el de los hooks PreToolUse de Claude Code): exit 2 => deny + motivo
+# por stderr. exit 0 => allow.
 
 set -uo pipefail
 

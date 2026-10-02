@@ -25,7 +25,7 @@ pub const MODULES: [Module; 11] = [
     Module { key: "ohmyposh", desc: "Prompt oh-my-posh, tema star",                plan: ohmyposh },
     Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
-    Module { key: "claude",   desc: "Claude Code: CLAUDE.md, settings y skills",   plan: claude },
+    Module { key: "pi",       desc: "Pi: AGENTS.md, settings, MCP, extensiones y skills", plan: pi },
     Module { key: "obsidian", desc: "Commit local de la bóveda cada 15 minutos",   plan: obsidian },
 ];
 
@@ -51,9 +51,10 @@ const HYPR_LEGACY: [&str; 9] = [
     "monitors-esc.lua",
 ];
 
-/// Lo único de `~/.claude` que escribe el usuario. El resto del directorio es
-/// estado que Claude Code gestiona solo: credenciales, sesiones y plugins.
-const CLAUDE_CONFIG: [&str; 6] = [
+/// Lo que el módulo `claude` enlazaba en `~/.claude` antes de que Pi lo
+/// reemplazara. Sólo se retiran los enlaces de este repo, nunca el estado de
+/// Claude Code (credenciales y sesiones), que `pi-claude-acp` sigue usando.
+const CLAUDE_LEGACY: [&str; 6] = [
     "CLAUDE.md",
     "settings.json",
     "statusline.sh",
@@ -61,6 +62,15 @@ const CLAUDE_CONFIG: [&str; 6] = [
     "output-styles",
     "rules",
 ];
+
+/// Lo único de `~/.pi/agent` que escribe el usuario. El resto es estado de Pi
+/// o de sus paquetes: credenciales, sesiones, cachés, la instalación y el tema
+/// `omarchy-system.json`, que `omarchy-theme-set-pi` regenera en cada cambio.
+const PI_CONFIG: [&str; 3] = ["AGENTS.md", "settings.json", "mcp.json"];
+
+/// Directorios de `pi/` que se enlazan entrada por entrada: en `~/.pi/agent`
+/// conviven con lo que instalan `npx skills` y los paquetes de Pi.
+const PI_SHARED_DIRS: [&str; 2] = ["skills", "extensions"];
 
 /// Quattro sacó Walker: estos destinos quedaron huérfanos en instalaciones
 /// anteriores a la 4.0.
@@ -202,22 +212,36 @@ fn omarchy(dots: &Dots) -> Result<Vec<Op>> {
     Ok(ops)
 }
 
-/// Cada skill se enlaza por su nombre: `~/.claude/skills` también guarda las
-/// skills que instalan Omarchy, `npx skills` y claude.ai, y ésas no son del repo.
-fn claude(dots: &Dots) -> Result<Vec<Op>> {
-    let target = dots.home(".claude");
-    let mut ops: Vec<Op> = CLAUDE_CONFIG
+fn pi(dots: &Dots) -> Result<Vec<Op>> {
+    let target = dots.home(".pi/agent");
+    let mut ops: Vec<Op> = PI_CONFIG
         .iter()
-        .map(|name| link_into(dots.repo("claude").join(name), &target))
+        .map(|name| link_into(dots.repo("pi").join(name), &target))
         .collect();
 
-    ops.extend(
-        dirs(&dots.repo("claude/skills"))?
-            .into_iter()
-            .map(|skill| link_into(skill, &target.join("skills"))),
-    );
+    for dir in PI_SHARED_DIRS {
+        ops.extend(
+            dirs(&dots.repo("pi").join(dir))?
+                .into_iter()
+                .map(|src| link_into(src, &target.join(dir))),
+        );
+    }
+    ops.extend(claude_leftovers(dots));
 
     Ok(ops)
+}
+
+fn claude_leftovers(dots: &Dots) -> Vec<Op> {
+    let claude = dots.home(".claude");
+    let skills = entries(&claude.join("skills")).unwrap_or_default();
+
+    CLAUDE_LEGACY
+        .iter()
+        .map(|name| claude.join(name))
+        .chain(skills)
+        .filter(|dest| owned_link(dest, dots.root()))
+        .map(remove)
+        .collect()
 }
 
 /// Sólo la mecánica de versionado vive en el repo: `dots` es público y la
@@ -345,12 +369,14 @@ fn file_name(path: &Path) -> &str {
 mod tests {
     use super::*;
     use crate::machine::Machine;
+    use std::os::unix::fs as unix;
     use tempfile::TempDir;
 
-    fn claude_repo() -> (TempDir, Dots) {
+    fn pi_repo() -> (TempDir, Dots) {
         let dir = TempDir::new().expect("tempdir");
-        let skills = dir.path().join("repo/claude/skills");
+        let skills = dir.path().join("repo/pi/skills");
         fs::create_dir_all(skills.join("locality")).expect("skill");
+        fs::create_dir_all(dir.path().join("repo/pi/extensions/guard")).expect("extension");
         fs::write(skills.join("README.md"), "").expect("file");
 
         let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"), Some(Machine::Notebook));
@@ -444,20 +470,54 @@ mod tests {
             .collect()
     }
 
+    fn removals(ops: &[Op]) -> Vec<PathBuf> {
+        ops.iter()
+            .filter_map(|op| match op {
+                Op::Remove { dest } => Some(dest.clone()),
+                _ => None,
+            })
+            .collect()
+    }
+
     #[test]
-    fn claude_links_each_config_entry_into_dot_claude() {
-        let (_dir, dots) = claude_repo();
+    fn pi_links_config_skills_and_extensions_into_the_agent_dir() {
+        let (_dir, dots) = pi_repo();
+        let agent = dots.home(".pi/agent");
 
-        let found = dests(&claude(&dots).expect("plan"));
+        let found = dests(&pi(&dots).expect("plan"));
 
-        for name in CLAUDE_CONFIG {
-            assert!(found.contains(&dots.home(".claude").join(name)), "{name}");
+        for name in PI_CONFIG {
+            assert!(found.contains(&agent.join(name)), "{name}");
         }
+        assert!(found.contains(&agent.join("skills/locality")));
+        assert!(found.contains(&agent.join("extensions/guard")));
+        assert!(!found.contains(&agent.join("skills/README.md")));
+        assert!(!found.contains(&agent.join("skills")));
+        assert!(!found.contains(&agent.join("themes/omarchy-system.json")));
+    }
+
+    #[test]
+    fn pi_retires_only_the_claude_links_this_repo_owns() {
+        let (dir, dots) = pi_repo();
+        let claude = dots.home(".claude");
+        fs::create_dir_all(claude.join("skills")).expect("skills");
+        fs::create_dir_all(dir.path().join("elsewhere")).expect("foreign target");
+        unix::symlink(dots.root().join("claude/CLAUDE.md"), claude.join("CLAUDE.md")).expect("owned");
+        unix::symlink(dots.root().join("claude/skills/locality"), claude.join("skills/locality")).expect("owned");
+        unix::symlink(dir.path().join("elsewhere"), claude.join("skills/foreign")).expect("foreign");
+        fs::write(claude.join(".credentials.json"), "{}").expect("state");
+
+        let removed = removals(&pi(&dots).expect("plan"));
+
+        assert!(removed.contains(&claude.join("CLAUDE.md")));
+        assert!(removed.contains(&claude.join("skills/locality")));
+        assert!(!removed.contains(&claude.join("skills/foreign")));
+        assert!(!removed.contains(&claude.join(".credentials.json")));
     }
 
     #[test]
     fn obsidian_links_the_script_and_units_but_not_the_vault() {
-        let (_dir, dots) = claude_repo();
+        let (_dir, dots) = pi_repo();
         let units = dots.home(".config/systemd/user");
 
         let found = dests(&obsidian(&dots).expect("plan"));
@@ -466,16 +526,5 @@ mod tests {
         assert!(found.contains(&units.join("obsidian-autocommit.service")));
         assert!(found.contains(&units.join("obsidian-autocommit.timer")));
         assert!(!found.contains(&dots.home("Documents/Obsidian")));
-    }
-
-    #[test]
-    fn claude_links_skill_directories_one_by_one() {
-        let (_dir, dots) = claude_repo();
-
-        let found = dests(&claude(&dots).expect("plan"));
-
-        assert!(found.contains(&dots.home(".claude/skills/locality")));
-        assert!(!found.contains(&dots.home(".claude/skills/README.md")));
-        assert!(!found.contains(&dots.home(".claude/skills")));
     }
 }
