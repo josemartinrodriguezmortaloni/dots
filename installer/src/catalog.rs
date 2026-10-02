@@ -54,9 +54,8 @@ const HYPR_LEGACY: [&str; 9] = [
 /// Lo que el módulo `claude` enlazaba en `~/.claude` antes de que Pi lo
 /// reemplazara. Sólo se retiran los enlaces de este repo, nunca el estado de
 /// Claude Code (credenciales y sesiones), que `pi-claude-acp` sigue usando.
-const CLAUDE_LEGACY: [&str; 6] = [
+const CLAUDE_LEGACY: [&str; 5] = [
     "CLAUDE.md",
-    "settings.json",
     "statusline.sh",
     "hooks",
     "output-styles",
@@ -71,6 +70,10 @@ const PI_CONFIG: [&str; 3] = ["AGENTS.md", "settings.json", "mcp.json"];
 /// Directorios de `pi/` que se enlazan entrada por entrada: en `~/.pi/agent`
 /// conviven con lo que instalan `npx skills` y los paquetes de Pi.
 const PI_SHARED_DIRS: [&str; 2] = ["skills", "extensions"];
+
+/// Claude Code corre como backend de Pi. Su único setting apaga los plugins que
+/// claude.ai sincroniza, que se habilitan por defecto y traen sus propios MCP.
+const CLAUDE_SETTINGS: &str = ".claude/settings.json";
 
 /// Quattro sacó Walker: estos destinos quedaron huérfanos en instalaciones
 /// anteriores a la 4.0.
@@ -226,6 +229,7 @@ fn pi(dots: &Dots) -> Result<Vec<Op>> {
                 .map(|src| link_into(src, &target.join(dir))),
         );
     }
+    ops.push(link(dots.repo("pi/claude/settings.json"), dots.home(CLAUDE_SETTINGS)));
     ops.extend(claude_leftovers(dots));
 
     Ok(ops)
@@ -494,6 +498,7 @@ mod tests {
         assert!(!found.contains(&agent.join("skills/README.md")));
         assert!(!found.contains(&agent.join("skills")));
         assert!(!found.contains(&agent.join("themes/omarchy-system.json")));
+        assert!(found.contains(&dots.home(CLAUDE_SETTINGS)));
     }
 
     #[test]
@@ -505,6 +510,7 @@ mod tests {
         unix::symlink(dots.root().join("claude/CLAUDE.md"), claude.join("CLAUDE.md")).expect("owned");
         unix::symlink(dots.root().join("claude/skills/locality"), claude.join("skills/locality")).expect("owned");
         unix::symlink(dir.path().join("elsewhere"), claude.join("skills/foreign")).expect("foreign");
+        unix::symlink(dots.root().join("pi/claude/settings.json"), dots.home(CLAUDE_SETTINGS)).expect("current");
         fs::write(claude.join(".credentials.json"), "{}").expect("state");
 
         let removed = removals(&pi(&dots).expect("plan"));
@@ -513,6 +519,7 @@ mod tests {
         assert!(removed.contains(&claude.join("skills/locality")));
         assert!(!removed.contains(&claude.join("skills/foreign")));
         assert!(!removed.contains(&claude.join(".credentials.json")));
+        assert!(!removed.contains(&dots.home(CLAUDE_SETTINGS)));
     }
 
     #[test]
