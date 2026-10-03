@@ -18,7 +18,7 @@ dots is the configuration of my Arch Linux machines: Hyprland on Omarchy Quattro
 - **One theme switch:** Ghostty, Neovim, tmux and Waybar follow the active Omarchy theme; Neovim reloads it live
 - **Safe installer:** a Rust/ratatui TUI that lists every file it displaces and moves it to `~/.dotfiles-backup/<timestamp>/`
 - **Per machine:** desktop and notebook share everything except the monitor layout
-- **Agents and notes:** Pi config with a command guard and a usage status, and a local git timer for the Obsidian vault
+- **Agents and notes:** Pi config with a command guard and the pi-statusline package, and a local git timer for the Obsidian vault
 
 <p>
   <a href="https://archlinux.org"><img alt="Arch Linux" src="https://img.shields.io/badge/ARCH-LINUX-0a0a0a.svg?style=for-the-badge&amp;logo=archlinux&amp;labelColor=000000" height="28"></a>
@@ -64,7 +64,7 @@ Each module is a set of symlinks from this repo to `~/`.
 | **ohmyposh** | `~/.config/ohmyposh/star.omp.json`                     | Prompt theme `star`                                                                               |
 | **themes**   | `~/.config/omarchy/themes/*`                           | Omarchy themes and the matching VS Code extension                                                 |
 | **omarchy**  | `~/.config/omarchy/{hooks,extensions,shell.toml}`      | `theme-set` hook (tmux/nvim), Quattro menu look, wallpaper pool shared by every theme             |
-| **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,skills/*,extensions/*}`, `~/.claude/settings.json` | Pi instructions, packages, MCP servers, own skills, the `guard` and `usage` extensions; Claude Code settings with the claude.ai-synced plugins off; removes the old `~/.claude` links |
+| **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,skills/*,extensions/*}`, `~/.claude/settings.json` | Pi instructions, packages, MCP servers, own skills, the `guard` extension; Claude Code settings with the claude.ai-synced plugins off; removes the old `~/.claude` links |
 | **obsidian** | `~/.local/bin/obsidian-autocommit`, systemd user units | Timer that commits the text of the local vault `~/Documents/Obsidian` every 15 min                |
 | **mise**     | `~/.config/mise/config.toml`                           | Global tools (claude, codex, gh, node, pi); runs `mise install` so every machine gets the same paths |
 
@@ -100,7 +100,7 @@ Gate every change before a commit:
 | ---------------------------------------------------- | -------------------------------------------------- |
 | `installer/check.sh`                                 | Installer tests, clippy, cyclomatic complexity < 4 |
 | `bash pi/extensions/guard/test-guard-bash.sh`        | Shell risk rules of the Pi guard                   |
-| `node --test pi/extensions/*/*.test.ts`              | Pi `guard` votes and `usage` status (Node 24+)     |
+| `node --test pi/extensions/*/*.test.ts`              | Pi `guard` votes (Node 24+)                        |
 | `bash obsidian/test-autocommit.sh`                   | Vault autocommit on a temporary repo               |
 
 ## System
