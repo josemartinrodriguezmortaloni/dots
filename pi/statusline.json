@@ -5,20 +5,9 @@
       "left": [
         { "segment": "cwd", "color": "dim", "priority": 10 },
         { "segment": "git-branch", "color": "dim", "priority": 8 },
-        { "segment": "session-name", "color": "dim", "priority": 6 }
-      ],
-      "right": [{ "segment": "session-time", "color": "dim", "priority": 3 }]
-    },
-    {
-      "left": [
+        { "segment": "session-name", "color": "dim", "priority": 6 },
         { "segment": "context", "bar": true, "color": "dim", "priority": 10 },
-        { "segment": "tokens", "color": "dim", "priority": 5 },
-        { "segment": "cache", "color": "dim", "priority": 2 },
-        { "segment": "cost", "color": "dim", "priority": 4 }
-      ],
-      "right": [
-        { "segment": "model", "color": "dim", "priority": 9 },
-        { "segment": "thinking", "color": "dim", "priority": 6 }
+        { "segment": "session-time", "color": "dim", "priority": 3 }
       ]
     },
     {
@@ -26,7 +15,13 @@
         { "segment": "usage", "window": "5h", "color": "dim", "priority": 8 },
         { "segment": "usage", "window": "7d", "color": "dim", "priority": 7 }
       ],
-      "right": [{ "segment": "statuses", "priority": 1 }]
+      "right": [
+        { "segment": "model", "color": "dim", "priority": 9 },
+        { "segment": "thinking", "color": "dim", "priority": 6 }
+      ]
+    },
+    {
+      "left": [{ "segment": "statuses", "priority": 1 }]
     }
   ]
 }
