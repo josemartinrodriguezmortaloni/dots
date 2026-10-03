@@ -66,7 +66,7 @@ const CLAUDE_LEGACY: [&str; 5] = [
 /// Lo único de `~/.pi/agent` que escribe el usuario. El resto es estado de Pi
 /// o de sus paquetes: credenciales, sesiones, cachés, la instalación y el tema
 /// `omarchy-system.json`, que `omarchy-theme-set-pi` regenera en cada cambio.
-const PI_CONFIG: [&str; 3] = ["AGENTS.md", "settings.json", "mcp.json"];
+const PI_CONFIG: [&str; 4] = ["AGENTS.md", "settings.json", "mcp.json", "statusline.json"];
 
 /// Directorios de `pi/` que se enlazan entrada por entrada: en `~/.pi/agent`
 /// conviven con lo que instalan `npx skills` y los paquetes de Pi.
