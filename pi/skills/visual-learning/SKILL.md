@@ -1,73 +1,83 @@
 ---
 name: visual-learning
-description: Build an interactive React textbook (nested tooltips, expandable readings, interactive widgets) from a provided source document. Use when the user asks to turn a text, paper, or chapter into an interactive textbook.
+description: Build an interactive textbook as a single HTML page (nested tooltips, expandable readings, interactive widgets) from a source document, written in ASD-STE100 in the user's language (default Spanish). Use when the user asks to turn a text, paper, or chapter into an interactive textbook.
 ---
 
-## Interactive Textbook: Specs
+# Visual learning
 
-General, high-level requirements:
+The product is one self-contained HTML page that teaches one source document. It has no project, no package manager, and no build step. Speed comes from four rules:
 
-- Faithfulness, and same level-of-detail: The interactive textbook should be entirely faithful to the original document (mostly verbatim), including same footnotes/reference, and the exact provided graphics (see also the "interactive widgets" section below).
-- Target audience: Assume the target audience of this textbook to be an extremely curious first-year university student of the corresponding major. (For example, if the original text is about neuroscience, assume that the audience is a neuroscience major but only taken non-AP high-school biology.) For concepts too advanced for the student that are also not in the "exclusion list" (additional concepts that the student already understands), use "nested tooltips" (see below).
+- **Ready runtime.** The tooltip runtime, the CSS, and the assembler already exist in `assets/` in this skill's directory. Agents write only content.
+- **Fixed contract.** The markup contract below never changes, so all writers start at the same time.
+- **Content is data.** Tooltips are `<template>` records, not code.
+- **Bounded loop.** The concept loop runs exactly two rounds. It never iterates "until no unknown concepts remain".
 
-Stylistically:
+## Inputs
 
-- Emit React components for individual sections; use MathJax + Latex for equations if any.
-- The main text's body should be mostly verbatim to the original text. 2 exceptions: nested tooltips and expanded readings.
-  - Nested tooltips: render in-line for any concepts in the knowledge graph unknown to the student (see below).
-  - Expanded readings: render right after key paragraphs, displayed as expandable accordion.
+- **Source document**: text, figures, footnotes, references.
+- **Output language**: the language the user names. Default: Spanish. File names, concept ids, and widget names stay in English.
+- **Audience**: a curious first-year university student of the subject, with only high-school background in it. If the user gives a knowledge level or an exclusion list (concepts the student already knows), use it. Drop exclusion entries unrelated to the subject before you pass the list to subagents.
 
-### Interactive widgets
+## Writing standard: ASD-STE100
 
-Use interactive widgets for "gears-level models" that would be beneficial for the students to understand.
+Every visible string follows ASD-STE100: main body, tooltips, expanded readings, captions, widget labels. The STE dictionary is English-only. In Spanish, apply the same rules, and use the most common literal word for each meaning.
 
-Use interactive widgets when:
+- One word has one meaning, and one meaning has one word. Keep the same term for a concept everywhere.
+- Technical names (the subject's terms of art) are allowed. Give each one a tooltip at its first use in a section.
+- Sentences: descriptive, max 25 words; procedural, max 20 words. One topic per sentence.
+- Paragraphs: one topic, max 6 sentences. Key information first.
+- Active voice. Simple tenses: present, past, future. In Spanish, use the indicative mood, and prefer active voice to passive "se" constructions.
+- In English, no "-ing" forms, except in technical names. In Spanish, no gerunds, except in technical names.
+- Noun clusters: max 3 words. Keep articles and connecting words.
+- Use vertical lists for sequences, conditions, and parallel items.
 
-- There's already a graphics in the provided text, and it might be helpful to reinforce understanding/expand upon: create an interactive widget in an expanded reading block after the original graphics.
-- A "gears-level model" is introduced and it might be helpful to the student's understanding: create an interactive widget in an expanded reading block after the paragraph needed.
-- Inside a (nested) tooltip: Use widgets more often (interactive or not), positioned after the explanation paragraph.
+**Faithfulness.** The main body rewrites the source prose in STE. It keeps every fact, claim, number, equation, footnote, reference, figure, and the section order. It adds and drops no claims. New explanations go only into tooltips and expanded readings.
 
-Since interactive widgets are displayed in (nested) tooltips/expanded readings and will generally not break the "happy path" flow, it is almost always better to create more of them if they help with understanding at all.
+## Markup contract
 
-See also: <https://www.lesswrong.com/posts/B7P97C27rvHPz3s9B/gears-in-understanding>
+Paths are relative to the output directory `<slug>/`. Each worker writes only its own files in `parts/`, so all workers run in parallel without conflicts.
 
-### Nested tooltips
+| Element | Contract |
+| --- | --- |
+| Section | `parts/sections/NN-slug.html`: one `<section id="NN-slug">` with an `<h2>`. |
+| Concept link | `<span data-c="kebab-id">term</span>`: opens a nested tooltip. |
+| Expanded reading | `<details class="expand"><summary>Title</summary>…</details>`. |
+| Figure | `<figure><img src="figures/x.png" alt="..."><figcaption>…</figcaption></figure>`. Copy the original file to `figures/`. The build embeds it in the page. |
+| Math | `\( … \)` inline, `\[ … \]` display (MathJax). Write `<`, `>`, `&` inside TeX as `&lt;`, `&gt;`, `&amp;`. |
+| Concept record | `parts/concepts/<batch>.html`: one `<template data-concept="kebab-id" data-title="Title">body</template>` per concept. |
+| Widget slot | `<div data-widget="name"></div>`, in a section, an expanded reading, or a concept record. |
+| Widget code | `parts/widgets/<file>.js`: `W["name"] = (root) => { … }`. The function builds DOM or SVG inside `root`, with plain JavaScript and inline styles. No imports, max 120 lines. Prefix each name with the file stem, so names stay unique. |
 
-Nested tooltips are a great way to explain concepts with long dependency chains, with a similar UX to Paradox Interactive's grand strategy games.
+## Workflow
 
-General UX:
-1.1. Cursor enters a tooltip-enabled element (UI widget, map object, or inline concept link in text).
+1. **Plan (inline).** Read the source. Split it by top-level heading. Choose the slug, the page title, the output language, and the exclusion list. Create `<slug>/parts/{sections,concepts,widgets}` and `<slug>/figures/`, and copy the original figures. Complete when each heading has a target section file.
+2. **Write sections (parallel, one message).** Launch one section writer per top-level heading. Paste in "Writing standard", "Markup contract", "Widgets", and the section's source text. The writer links a concept with `data-c` at its first use in the section, if the concept is not in the exclusion list. Complete when the section file exists and the writer returns its concept list: `{ id, term, gloss }`, with a one-line gloss.
+3. **Concepts round 1 (parallel).** Merge the concept lists, deduplicate by id, and map synonyms to one id. Split the ids into batches of max 8 concepts. Launch one worker per batch, all in the same message. In the same message, launch one reviewer per section (see "Review"). A concept worker writes one `parts/concepts/<batch>.html`. Each tooltip body has max 120 words, in STE. It can link other concepts with `data-c`. Complete when the worker returns the new ids it linked that are not yet in the registry.
+4. **Concepts round 2 (parallel, last round).** Batch the new ids from round 1 the same way. These tooltips are terminal: they link only ids that already exist, and add no new ids. If a term has no record, write it as plain text.
+5. **Build and gate.** Run:
 
-- 1.1.1. Start hover timer (300ms).
-  1.2. Timer fires → render tooltip.
-- 1.2.1. Position: default anchor offset from cursor, biased away from the element it describes so it never occludes it.
-  2.1. First-level tooltip is initially non-interactive (mouse passes through it).
-  2.2. Lock conditions:
-- 2.2.2. Hover-delay mode: player keeps cursor still over the source for N ms → tooltip becomes interactive automatically; show a subtle progress affordance (fill bar on tooltip edge) so the state change is predictable, not surprising.
-- 2.2.3. Edge: player moves cursor toward the tooltip during the transition → provide a "safe corridor" (triangle between cursor and tooltip bounds) so diagonal travel doesn't dismiss it en route. This is the single most common failure in naive implementations.
-  2.3. Locked visual state: border/pin icon change so the player knows clicks will now hit the tooltip, not the map behind it.
-  3.1. Inside a locked tooltip, concept links (highlighted terms) are hoverable.
-- 3.1.1. Hover link → same timer logic as 1.1 → spawn child tooltip.
-- 3.1.2. Child positions adjacent to parent, offset so parent's link text remains visible.
-  3.2. Depth management.
-- 3.2.1. Recommended soft cap on simultaneous open levels (e.g. 4–5); beyond that, spawning a new child collapses the oldest ancestor beyond the chain root.
-- 3.2.2. Edge: circular references → disallowed, and display them differently so that the player would know
-  3.3. Each child inherits the lock mechanism recursively (hover child → child locks → its links become hoverable).
-  4.1. Moving cursor off the entire chain (outside all tooltip bounds and safe corridors) → grace timer (~200–300ms), then dismiss the whole chain. Grace period prevents accidental teardown from a 2-pixel overshoot.
-  4.2. Moving cursor back to an ancestor tooltip → dismiss all descendants of that ancestor after the grace period (pruning, not full teardown).
-  4.3. Explicit dismissals:
-- 4.3.1. Esc → close entire chain (and only the chain; must not also close the underlying game window — input priority ordering matters here).
+   ```sh
+   node <skill-dir>/assets/build.mjs <slug> --lang es --title "Page title"
+   ```
 
-### Concepts exclusion list
+   The script checks every concept link, widget slot, figure, and widget syntax, then writes `<slug>/index.html`. When it exits 1, fix each listed failure in `parts/` and run it again. Complete when it prints `OK`. Report the path to `index.html`.
 
-(note that this list might include concepts not related to the textbook subject in mind - ignore those in your subagent instructions)
+Pass the "Writing standard" section and the exclusion list to every content worker and reviewer.
 
-Concepts that the student already understands:
+## Review
 
-- <fill in with your knowledge level, e.g. "AP Biology only", "undergrad-level understanding of math">
+One reviewer per section runs during round 1, in parallel with the concept workers. The reviewer compares the section file to its source text. Every fact, number, equation, footnote, reference, and figure must be present, and every sentence must follow STE. The reviewer fixes the section file in place. It edits no other file. Complete when the section passes both checks.
 
-### Workflow setup
+## Widgets
 
-Lets first fan out with 1 agent for 1 top-level heading, with the agent generate the react components + provide report on prerequisite concepts, with adversarial review, queued after; then take the union of all prerequisite concepts, start the nested tooltips loop with a worker pool side of 4, each worker taking on at most 8 concepts, and iterate until there are no more unknown concepts. setup a repo with vite + react + ts + tailwind, plus a components library before you launch the workflow
+A widget shows a gears-level model: a mechanism with a variable that the student changes to see the effect. See also: <https://www.lesswrong.com/posts/B7P97C27rvHPz3s9B/gears-in-understanding>
+
+- After each original figure, add an expanded reading with a widget that extends the figure.
+- After a paragraph that introduces a gears-level model, add an expanded reading with a widget for that model.
+- In a tooltip, add a widget only if the concept is a gears-level model. Max one widget per tooltip.
+
+## Runtime
+
+`assets/runtime.js`, `assets/page.css`, and `assets/build.mjs` are fixed. Content workers never edit them. To change the tooltip behaviour, read `assets/tooltip-ux.md` first.
 
 Future: analytics, quizzes
