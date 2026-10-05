@@ -1,7 +1,7 @@
 {
   "defaultModel": "opus",
   "defaultProvider": "claude-acp",
-  "lastChangelogVersion": "1.0.1",
+  "lastChangelogVersion": "1.0.3",
   "npmCommand": [
     "mise",
     "exec",
@@ -11,7 +11,6 @@
   ],
   "packages": [
     "npm:gentle-engram@0.1.16",
-    "npm:pi-mcp-adapter",
     {
       "source": "../../Work/pp/ccp/pi-claude-acp",
       "extensions": [
@@ -26,7 +25,7 @@
   ],
   "theme": "omarchy-system",
   "compaction": {
-    "enabled": false
+    "enabled": true
   },
   "transport": "auto",
   "markdown": {
@@ -53,5 +52,12 @@
   ],
   "extensions": [
     "-builtin:mcp"
-  ]
+  ],
+  "claudeAcp": {
+    "hiddenTools": [
+      "mem_*",
+      "resolve-library-id",
+      "query-docs"
+    ]
+  }
 }
