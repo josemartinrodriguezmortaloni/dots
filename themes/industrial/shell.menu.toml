@@ -1,17 +1,18 @@
-# DESIGN.md §5.8 and §3.7: an opaque --panel with a 1 px --line border over an
-# 80 % --void scrim. The selected row is an inversion: --accent fill with
-# --on-accent text.
+# DESIGN.md §5.8 and §5.13: a --panel card with a 1 px --line border over a
+# --void scrim. Both are translucent so the blurred background (looknfeel.lua)
+# shows through. The selected row is an inversion: --blue-500 fill with --void
+# text.
 [menu]
-background                = "#262626"
-background-alpha          = 1.0
-text                      = "#d4d4d4"
-border                    = "#4a4a4a"
+background                = "#0d1112"
+background-alpha          = 0.6
+text                      = "#f4f8f8"
+border                    = "#676b6c"
 border-alpha              = 1.0
 border-width              = 1
-scrim                     = "#1f1f1f"
-scrim-alpha               = 0.8
-selected-background       = "#ffffff"
+scrim                     = "#080c0d"
+scrim-alpha               = 0.3
+selected-background       = "#def85d"
 selected-background-alpha = 1.0
-selected-text             = "#1f1f1f"
-selected-border           = "#ffffff"
+selected-text             = "#080c0d"
+selected-border           = "#def85d"
 selected-border-alpha     = 0

@@ -1,8 +1,8 @@
 # DESIGN.md §5.15: a --panel-2 box with a 1 px --line border, opaque.
 [tooltip]
-background       = "#303030"
+background       = "#161f1e"
 background-alpha = 1.0
-text             = "#d4d4d4"
-border           = "#4a4a4a"
+text             = "#f4f8f8"
+border           = "#676b6c"
 border-alpha     = 1.0
 border-width     = 1

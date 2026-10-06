@@ -88,7 +88,7 @@ Video en 10 columnas, datos en 2.
 
 ### 2.1 Barra de menú
 
-- Alto 36 px, fondo `--panel`, borde inferior de 1 px en `--line`.
+- Alto 36 px, fondo `--panel`, borde inferior de 1 px en `--blue-500`.
 - Izquierda: emblema de 16 px + `Systems` en `--t-label` `--ink-300` + versión `v24.004.b` en `--ink-500`.
 - Ítems `FILE EDIT VIEW WINDOW COMMS NETWORK`, en `--t-label` `--ink-700`, en celdas de igual ancho (≈ 140 px) separadas por líneas verticales de 1 px `--line`.
 - Derecha: bandeja de iconos de 14 px (`+`, monitores, engranaje, `ENG`, niveles, candado), cada uno con una tecla F en superíndice de 6 px.
@@ -108,20 +108,20 @@ Video en 10 columnas, datos en 2.
 Variante de la barra rayada (DESIGN.md §5.12) con rótulo y valor.
 
 - Fila de 17 px: rótulo `LEVEL 1` (`--t-body`, peso 500, `--ink-100`) + barra + valor.
-- Barra de 6 px de alto. Segmento opcional en `--accent` sólido al final del relleno, para marcar el tramo actual.
+- Barra de 6 px de alto. Segmento opcional en `--blue-500` sólido al final del relleno, para marcar el tramo actual.
 - Valor a la derecha: `05.33` en `--t-body` `tabular-nums` `--ink-100`, seguido de un glifo `▲` de 6 px.
 - Encima de las filas va un bloque de chips (`FLR`, `SCN`, `EXT`, `OVR`), agrupados de a 3–6, con uno o dos activos.
 
 ### 3.2 Árbol de archivos
 
 - Filas de 25 px. Grupo: caret `▼` en `--ink-300` + nombre `.SSY/051_23B` en `--ink-100`.
-- Ítem: sangría de 16 px, icono de 12 px (documento en `--ink-300`, o documento relleno `--accent` para el ítem seleccionado) + ruta en minúsculas `files/fgrkshn/dfgr999/23/…` en `--t-body`.
+- Ítem: sangría de 16 px, icono de 12 px (documento relleno `--blue-500`, o círculo blanco para el ítem seleccionado) + ruta en minúsculas `files/fgrkshn/dfgr999/23/…` en `--t-body`.
 - Ítem activo en `--ink-100`. Ítem inactivo en `--ink-900` (texto fantasma).
 
 ### 3.3 Grilla de códigos (`FILES 49/19/68`, `FILE SYSTEM - LIVE`)
 
 - 4–5 columnas iguales, filas de 11 px.
-- Fila: índice en un cuadrado de 7 px `--ink-700` con numeral de 6 px + marcador opcional `▶` + código `0000121` en `--t-code` `--ink-300`.
+- Fila: índice en un cuadrado de 7 px `--blue-700` con numeral de 6 px + marcador opcional `▶` + código `0000121` en `--t-code` `--ink-300`.
 - Códigos enmascarados `XXX-XX2` mezclados con los numéricos.
 - 20–30 % de las filas en `--ink-900`.
 
@@ -136,13 +136,13 @@ Variante de la barra rayada (DESIGN.md §5.12) con rótulo y valor.
 
 - Dos pares por fila, filas de 20 px.
 - Clave en mayúsculas con dos puntos (`CHICAGO:`) en `--t-body` `--ink-300`.
-- Valor `14:23:45` en `--accent` `tabular-nums`.
+- Valor `14:23:45` en `--blue-300` `tabular-nums`.
 
 ### 3.6 Tabla de estructura (`STRUCTURE`)
 
 - Encabezados de columna en textura `--ink-500` (`INPT`, `OTPT`, `RSLTS`, `RTE`).
-- Valores en pares (`20-00 38 40`). La fila actual en `--accent`, el resto en `--ink-300`.
-- Última columna: grilla de celdas de 12 px con números. Celda seleccionada con relleno `--accent`. Celda enfocada con contorno de 1 px `--ink-300`.
+- Valores en pares (`20-00 38 40`). La fila actual en `--blue-300`, el resto en `--ink-300`.
+- Última columna: grilla de celdas de 12 px con números. Celda seleccionada con relleno `--blue-500`. Celda enfocada con contorno de 1 px `--ink-300`.
 
 ### 3.7 Dial radial
 
@@ -164,17 +164,17 @@ Gráfico de eventos en filas horizontales.
 - Rótulo de rango de cada fila a la izquierda.
 - Eventos:
   - Ticks verticales de 2×8 px en `--ink-100`, en grupos tipo código de barras.
-  - Cuadrados de 6 px en `--accent`.
+  - Cuadrados de 6 px en `--blue-500`.
   - Tramos: línea de 1 px con topes en los extremos y un micro rótulo centrado.
   - Cápsulas: rectángulo de doble línea de 3 px de alto, en `--ink-300`.
   - Marcadores `▽` y `△` de 6 px, y cruces `+` de 14 px.
   - Un tag `--red-600` marca el evento seleccionado.
-- Barra inferior: progreso sólido de 8 px en `--accent`, con rótulo de rango (`01-10`) y una franja de ticks.
+- Barra inferior: progreso sólido de 8 px en `--blue-500`, con rótulo de rango (`01-10`) y una franja de ticks.
 - Micro rótulos `ACTIVE` y pares de valores (`37.95 / 38.23`) en los márgenes.
 
 ### 3.9 Terminal
 
-- Cabecera: badge emblema + `TERMINAL 1 / SCANNING` (sufijo en `--accent`) + textura `DECRYPTION`.
+- Cabecera: badge emblema + `TERMINAL 1 / SCANNING` (sufijo en `--blue-300`) + textura `DECRYPTION`.
 - Franja de subtítulo: barra de 16 px sobre `--panel-2` con la ruta `SCAN/REMOVABLE_MEDIA_DECRYPTION` en textura. Chevrons `▷` en el margen izquierdo.
 - Área de código sobre `--panel-2`. Números de línea en `--ink-500`. Código en `--t-code` `--ink-300`.
 - Sintaxis: palabras clave, rutas y resultados exitosos en `--ink-100`. `Error`, strings y literales en `--red-600`.
@@ -185,20 +185,20 @@ Gráfico de eventos en filas horizontales.
 ### 3.10 Tile CCTV
 
 - Video a color natural. Tiles contiguos, sin separación.
-- Separación entre tiles: línea de 1 px en `--line`. Cruz `+` de 9 px en `--ink-100` en cada intersección.
+- Separación entre tiles: línea de 1 px en `--blue-500` al 70 %. Cruz `+` de 9 px en `--ink-100` en cada intersección.
 - Cabecera superpuesta al video, sin caja de fondo: badge + `CCTV ZOOM -21.27.3V0` + textura `SELECT`.
 - Arriba a la derecha: chips de textura `SNAPSHOT`, `VIEW`, `ACTIVE`, y los controles de ventana.
 - Lateral derecho interno: columna de pares de valores (`28.27 / 34.98`) en textura `--ink-100`.
-- Chips `SCANNING` de 20×6 px, con relleno `--accent` o contorno `--ink-300`.
-- Controles de reproducción: 4 círculos de 14 px con contorno de 1 px (`◀`, `▶`, `●`, `▢`). El activo va relleno en `--accent`.
-- Leyenda sobre el video: `REF 1320/78 TRANSMISSION` en 14 px con tracking de 0,1 em. `REF 1320/78` en `--accent`, `TRANSMISSION` en `--ink-100`.
+- Chips `SCANNING` de 20×6 px, con relleno `--blue-500` o contorno `--ink-300`.
+- Controles de reproducción: 4 círculos de 14 px con contorno de 1 px (`◀`, `▶`, `●`, `▢`). El activo va relleno en `--blue-500`.
+- Leyenda sobre el video: `REF 1320/78 TRANSMISSION` en 14 px con tracking de 0,1 em. `REF 1320/78` en `--blue-300`, `TRANSMISSION` en `--ink-100`.
 - Tile offline: `▷ STATUS` y `OFFLINE` centrados en `--t-label` `--ink-500`, con `ACTIVE IP 541.112.255.01` en textura.
 
 ### 3.11 Recuadro de detección facial
 
 - Rectángulo de 1 px `--ink-100` alrededor del rostro.
 - Barra de 4 px en `--amber-500` sobre todo el borde superior.
-- Icono de captura de 12 px (cuadrado `--accent` con una diagonal) en la esquina superior izquierda, dentro del recuadro.
+- Icono de captura de 12 px (cuadrado `--blue-500` con una diagonal) en la esquina superior izquierda, dentro del recuadro.
 - ID del sujeto (`208`) en 16 px `--ink-100`, fuera del recuadro, a la izquierda.
 - Coordenadas `X: 45 / Y:` en textura, fuera del recuadro, arriba a la derecha.
 - Etiqueta `▣ EID > 133` en textura, debajo del recuadro.

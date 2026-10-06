@@ -1,0 +1,12 @@
+# The bar is a translucent --void strip so the Industrial blur
+# (looknfeel.lua) shows through it.
+# omarchy-theme-set-templates swaps this whole section into shell.toml, so every
+# key of the section is listed. Values are literal: this file is not a template.
+[bar]
+background       = "#080c0d"
+background-alpha = 0.75
+text             = "#d9dddd"
+active           = "#ef4c42"
+scale-with-font  = true
+size-horizontal  = 26
+size-vertical    = 28

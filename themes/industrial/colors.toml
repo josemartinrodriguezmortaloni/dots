@@ -1,61 +1,64 @@
 # Industrial: the tokens of DESIGN.md §3.1 mapped onto Omarchy's palette.
-# Greys are neutral (chroma 0). The only hues are DESIGN.md's two signals,
-# --red-600 for errors and --amber-500 for progress and warnings (§3.2).
-# Blue, the usual accent slot, takes --accent: white marks selection, links
-# and focus.
+# The canvas is near black with a slight green tint. The accent is lime
+# (--blue-500): selection, primary action and progress. Red, amber, orange and
+# teal are point signals (§3.2).
 #
 # Every text colour keeps 4.5:1 or more on --void (DESIGN.md §3.3), so nothing
 # here is darker than --ink-500 except brown and muted, which carry no readings.
 #
-#   #1f1f1f --void         background, and both darker shades: §3.7 forbids
-#                          anything darker than the canvas
-#   #262626 --panel        lighter_background
-#   #3a3a3a --ink-900      selection (Neovim Visual, LSP references)
-#   #4a4a4a --line         selection_background, inactive window border
-#   #707070 --ink-700      muted (comments, ghost text), brown
-#   #9a9a9a --ink-500      dark_foreground
-#   #b0b0b0 --ink-300      light_foreground, green, cyan
-#   #c8c8c8 --accent-press magenta
-#   #d4d4d4 --ink-100      foreground
-#   #ffffff --accent       accent, cursor, blue
-#   #e96d66 --red-600      red
-#   #d9974a --amber-500    yellow, orange
+#   #080c0d --void         background, and both darker shades
+#   #0d1112 --panel        lighter_background
+#   #25292a --ink-900      selection (Neovim Visual, LSP references)
+#   #383e3e --grid         selection_background
+#   #676b6c --line         inactive window border
+#   #626d69 --ink-700      muted (comments, ghost text), brown
+#   #7b8784 --ink-500      dark_foreground
+#   #d9dddd --ink-300      foreground
+#   #f4f8f8 --ink-100      light and bright foreground
+#   #def85d --blue-500     accent, cursor, green, bright_blue
+#   #c9f057 --blue-300     blue, bright_green
+#   #90af3c --blue-700     magenta, end of the active border gradient
+#   #ef4c42 --red-600      red
+#   #e7b954 --amber-500    yellow
+#   #ef7b2f --orange-500   orange
+#   #4fdabe --teal-300     cyan
 #
-# selection_background is --line and not a white inversion: VS Code and
-# Obsidian lay unchanged --ink-100 text over it, which a white fill hides.
+# selection_background is --grid and not a lime fill: VS Code and Obsidian lay
+# unchanged --ink-100 text over it, which a lime fill hides.
 mode = "dark"
 
-accent = "#ffffff"
-selection = "#3a3a3a"
-muted = "#707070"
+accent = "#def85d"
+selection = "#25292a"
+muted = "#626d69"
 
-background = "#1f1f1f"
-dark_background = "#1f1f1f"
-darker_background = "#1f1f1f"
-lighter_background = "#262626"
+background = "#080c0d"
+dark_background = "#080c0d"
+darker_background = "#080c0d"
+lighter_background = "#0d1112"
 
-foreground = "#d4d4d4"
-dark_foreground = "#9a9a9a"
-light_foreground = "#b0b0b0"
-bright_foreground = "#ffffff"
+foreground = "#d9dddd"
+dark_foreground = "#7b8784"
+light_foreground = "#f4f8f8"
+bright_foreground = "#f4f8f8"
 
-selection_background = "#4a4a4a"
-selection_foreground = "#ffffff"
+selection_background = "#383e3e"
+selection_foreground = "#f4f8f8"
 
-red = "#e96d66"
-yellow = "#d9974a"
-orange = "#d9974a"
-green = "#b0b0b0"
-cyan = "#b0b0b0"
-blue = "#ffffff"
-magenta = "#c8c8c8"
-brown = "#707070"
+red = "#ef4c42"
+yellow = "#e7b954"
+orange = "#ef7b2f"
+green = "#def85d"
+cyan = "#4fdabe"
+blue = "#c9f057"
+magenta = "#90af3c"
+brown = "#626d69"
 
-bright_red = "#e96d66"
-bright_yellow = "#d9974a"
-bright_green = "#d4d4d4"
-bright_cyan = "#c8c8c8"
-bright_blue = "#ffffff"
-bright_magenta = "#d4d4d4"
+bright_red = "#ef4c42"
+bright_yellow = "#e7b954"
+bright_green = "#c9f057"
+bright_cyan = "#4fdabe"
+bright_blue = "#def85d"
+bright_magenta = "#d9dddd"
 
-hyprland_inactive_border = "#4a4a4a"
+hyprland_active_border = "#def85d #90af3c 45deg"
+hyprland_inactive_border = "#676b6c"

@@ -1,21 +1,12 @@
--- Industrial window geometry, DESIGN.md §3.5: a 1 px stroke, square corners,
--- and depth drawn with borders only, so no shadow and no blur. The border
--- colours come from hyprland.lua, which Omarchy generates from colors.toml.
+-- Industrial only: frosted glass on the bar and the menu card.
+-- hypr/looknfeel.lua requires this module last, so the rules exist only while
+-- Industrial is the current theme. Hyprland blurs only the pixels whose alpha
+-- is above ignore_alpha.
 --
--- hypr/looknfeel.lua requires this module last, so it replaces the user's
--- geometry only while Industrial is the current theme.
-hl.config({
-  general = {
-    border_size = 1,
-  },
+-- The bar shows the blur through its 0.75 background (shell.bar.toml).
+hl.layer_rule({ match = { namespace = "omarchy-bar" }, blur = true, ignore_alpha = 0.15 })
 
-  decoration = {
-    rounding = 0,
-    shadow = {
-      enabled = false,
-    },
-    blur = {
-      enabled = false,
-    },
-  },
-})
+-- The menu is a full-screen layer: a 0.3 scrim with a 0.6 card on top
+-- (shell.menu.toml), about 0.72 where they overlap. A 0.5 threshold blurs the
+-- card and leaves the background behind the scrim sharp.
+hl.layer_rule({ match = { namespace = "omarchy-menu" }, blur = true, ignore_alpha = 0.5 })

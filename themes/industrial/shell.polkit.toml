@@ -1,14 +1,14 @@
 # DESIGN.md §5.13: a floating --panel with a 1 px --line border over the 80 %
-# --void scrim. The primary action is --accent; a failed attempt turns the
+# --void scrim. The primary action is --blue-500; a failed attempt turns the
 # border --red-600 and leaves the message in --ink-100 (§3.3).
 [polkit]
-background       = "#262626"
+background       = "#0d1112"
 background-alpha = 1.0
-text             = "#d4d4d4"
-text-error       = "#d4d4d4"
-border           = "#4a4a4a"
-border-error     = "#e96d66"
+text             = "#f4f8f8"
+text-error       = "#f4f8f8"
+border           = "#676b6c"
+border-error     = "#ef4c42"
 border-alpha     = 1.0
-scrim            = "#1f1f1f"
+scrim            = "#080c0d"
 scrim-alpha      = 0.8
-accent           = "#ffffff"
+accent           = "#def85d"

@@ -1,17 +1,17 @@
 # DESIGN.md §5.5 and §6: an opaque --panel-2 field. Idle is an --ink-700
-# contour (the 3:1 boundary of §3.3), typing is the --accent focus contour, and
+# contour (the 3:1 boundary of §3.3), typing is the --blue-300 focus contour, and
 # a wrong password turns the border --red-600. The error text stays --ink-100:
-# §3.3 never sets a message in red, which reads 4.3:1 on --panel-2.
+# §3.3 never sets a message in red.
 [lock]
-background       = "#303030"
+background       = "#161f1e"
 background-alpha = 1.0
-text             = "#d4d4d4"
-placeholder      = "#9a9a9a"
-text-error       = "#d4d4d4"
-border           = "#707070"
-border-active    = "#ffffff"
-border-error     = "#e96d66"
+text             = "#f4f8f8"
+placeholder      = "#7b8784"
+text-error       = "#f4f8f8"
+border           = "#626d69"
+border-active    = "#c9f057"
+border-error     = "#ef4c42"
 border-alpha     = 1.0
 border-width     = 1
-selection        = "#ffffff"
+selection        = "#def85d"
 selection-alpha  = 0.35

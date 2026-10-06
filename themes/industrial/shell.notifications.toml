@@ -1,12 +1,12 @@
 # DESIGN.md §5.14: a --panel-2 strip with a 1 px --line border. The countdown
-# is a progress bar, so it takes --accent (§3.2).
+# is a progress bar, so it takes --blue-500 (§3.2).
 # omarchy-theme-set-templates swaps this whole section into shell.toml, so every
 # key of the section is listed. Values are literal: this file is not a template.
 [notifications]
-background       = "#303030"
+background       = "#161f1e"
 background-alpha = 1.0
-text             = "#d4d4d4"
-border           = "#4a4a4a"
+text             = "#f4f8f8"
+border           = "#676b6c"
 border-alpha     = 1.0
 border-width     = 1
-countdown        = "#ffffff"
+countdown        = "#def85d"

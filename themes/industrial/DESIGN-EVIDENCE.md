@@ -2,7 +2,7 @@
 
 Respaldo de los valores de [`DESIGN.md`](DESIGN.md). Consultalo para verificar un valor, resolver una contradicción con una captura o extender el catálogo de componentes.
 
-Regla de precedencia: un cuadro de los videos originales prevalece sobre este archivo, y este archivo prevalece sobre `DESIGN.md` en medidas y layout. El color, la familia tipográfica y el movimiento son decisiones de `DESIGN.md` §3 y no se verifican contra la película.
+Regla de precedencia: un cuadro de los videos originales prevalece sobre este archivo, y este archivo prevalece sobre `DESIGN.md` en color, medida y comportamiento.
 
 ---
 

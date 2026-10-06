@@ -1,28 +1,28 @@
 # DESIGN.md §6: a resting control is an --ink-700 contour (the 3:1 boundary of
-# §3.3), hover brightens it to --ink-300, and focus and selection are the
-# --accent contour.
+# §3.3), hover brightens it to --ink-300, focus is the --blue-300 contour, and
+# selection is the --blue-500 contour.
 [controls]
 normal-color        = "foreground"
 normal-fill-alpha   = 0.03
-normal-border       = "#707070"
+normal-border       = "#626d69"
 normal-border-width = 1
 normal-border-alpha = 1.0
 
 hover-cursor-color        = "accent"
 hover-cursor-fill-alpha   = 0.08
-hover-cursor-border       = "#b0b0b0"
+hover-cursor-border       = "#d9dddd"
 hover-cursor-border-width = 1
 hover-cursor-border-alpha = 1.0
 
 focus-color        = "accent"
 focus-fill-alpha   = 0.08
-focus-border       = "#ffffff"
+focus-border       = "#c9f057"
 focus-border-width = 1
 focus-border-alpha = 1.0
 
 selected-color        = "accent"
 selected-fill-alpha   = 0.16
-selected-border       = "#ffffff"
+selected-border       = "#def85d"
 selected-border-width = 1
 selected-border-alpha = 1.0
 
