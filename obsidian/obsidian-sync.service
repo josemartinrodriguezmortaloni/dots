@@ -1,0 +1,12 @@
+[Unit]
+Description=Sincroniza la bóveda Obsidian con GitHub
+
+[Service]
+ExecStart=%h/.local/bin/obsidian-sync
+Restart=always
+RestartSec=30
+# Código 3: la bóveda tiene otra historia que el remoto y hay que unificarla a mano.
+RestartPreventExitStatus=3
+
+[Install]
+WantedBy=default.target

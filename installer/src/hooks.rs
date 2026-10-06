@@ -8,15 +8,24 @@ type Hook = fn(&Path) -> Vec<String>;
 /// Omarchy Quattro lo movió y la ruta vieja ya no existe.
 const THEME_NAME: &str = ".local/state/omarchy/current/theme.name";
 
+/// Omarchy renderiza `~/.config/omarchy/themed/zathura.tpl` sólo al aplicar
+/// un tema: hasta entonces `zathurarc` incluye un archivo que no existe.
+const ZATHURA_COLORS: &str = ".local/state/omarchy/current/theme/zathura";
+
+const SYNC_SERVICE: &str = "obsidian-sync.service";
+
+/// Lo reemplazó `obsidian-sync`. Borrar su unit no lo detiene: systemd mantiene
+/// cargado lo que ya corre.
 const AUTOCOMMIT_TIMER: &str = "obsidian-autocommit.timer";
 
-const HOOKS: [(&str, Hook); 7] = [
+const HOOKS: [(&str, Hook); 8] = [
     ("hypr", reload_hyprland),
     ("waybar", restart_waybar),
     ("omarchy", apply_theme_hook),
     ("zsh", shell_hint),
     ("tmux", shell_hint),
-    ("obsidian", enable_autocommit),
+    ("zathura", zathura_colors_hint),
+    ("obsidian", enable_sync),
     ("mise", install_tools),
 ];
 
@@ -100,14 +109,28 @@ fn shell_hint(_home: &Path) -> Vec<String> {
     vec!["abrí una terminal nueva para tomar los cambios de zsh/tmux".to_owned()]
 }
 
+fn zathura_colors_hint(home: &Path) -> Vec<String> {
+    if home.join(ZATHURA_COLORS).exists() {
+        return Vec::new();
+    }
+
+    vec!["zathura sin colores: aplicá el tema de nuevo con `omarchy theme set` para renderizar la plantilla".to_owned()]
+}
+
 /// systemd no ve una unit nueva hasta recargar, y `enable --now` la arranca
-/// sin esperar al próximo login.
-fn enable_autocommit(_home: &Path) -> Vec<String> {
-    let enabled = sh::quiet("systemctl", &["--user", "daemon-reload"])
-        && sh::quiet("systemctl", &["--user", "enable", "--now", AUTOCOMMIT_TIMER]);
+/// sin esperar al próximo login. `restart` toma un script nuevo si ya corría.
+fn enable_sync(_home: &Path) -> Vec<String> {
+    sh::quiet("systemctl", &["--user", "stop", AUTOCOMMIT_TIMER]);
+
+    let steps: [&[&str]; 3] = [
+        &["--user", "daemon-reload"],
+        &["--user", "enable", SYNC_SERVICE],
+        &["--user", "restart", SYNC_SERVICE],
+    ];
+    let enabled = steps.iter().all(|args| sh::quiet("systemctl", args));
 
     match enabled {
-        true => vec![format!("{AUTOCOMMIT_TIMER} activo")],
-        false => vec![format!("no se pudo activar {AUTOCOMMIT_TIMER}")],
+        true => vec![format!("{SYNC_SERVICE} activo")],
+        false => vec![format!("no se pudo activar {SYNC_SERVICE}")],
     }
 }

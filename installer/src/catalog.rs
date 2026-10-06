@@ -15,18 +15,19 @@ pub struct Module {
     pub plan: fn(&Dots) -> Result<Vec<Op>>,
 }
 
-pub const MODULES: [Module; 12] = [
+pub const MODULES: [Module; 13] = [
     Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
     Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
     Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
     Module { key: "waybar",   desc: "Barra de estado Waybar",                      plan: waybar },
     Module { key: "tmux",     desc: "Tmux con prefijo C-Space",                    plan: tmux },
+    Module { key: "zathura",  desc: "Visor PDF Zathura con colores del tema",      plan: zathura },
     Module { key: "zsh",      desc: "Zsh + Zinit + oh-my-posh",                    plan: zsh },
     Module { key: "ohmyposh", desc: "Prompt oh-my-posh, tema star",                plan: ohmyposh },
     Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
     Module { key: "pi",       desc: "Pi: AGENTS.md, settings, MCP, extensiones y skills", plan: pi },
-    Module { key: "obsidian", desc: "Commit local de la bóveda cada 15 minutos",   plan: obsidian },
+    Module { key: "obsidian", desc: "Sincroniza la bóveda con GitHub",             plan: obsidian },
     Module { key: "mise",     desc: "Herramientas globales con mise (claude, pi…)", plan: mise },
 ];
 
@@ -83,6 +84,15 @@ const WALKER_LEFTOVERS: [&str; 2] = [
     ".config/omarchy/themed/walker.css.tpl",
 ];
 
+/// El timer de commit local cada 15 minutos que reemplazó `obsidian-sync`.
+/// El enlace de `timers.target.wants` lo crea `systemctl enable`.
+const AUTOCOMMIT_LEFTOVERS: [&str; 4] = [
+    ".local/bin/obsidian-autocommit",
+    ".config/systemd/user/obsidian-autocommit.service",
+    ".config/systemd/user/obsidian-autocommit.timer",
+    ".config/systemd/user/timers.target.wants/obsidian-autocommit.timer",
+];
+
 pub fn find(key: &str) -> Option<&'static Module> {
     MODULES.iter().find(|module| module.key == key)
 }
@@ -110,6 +120,18 @@ fn tmux(dots: &Dots) -> Result<Vec<Op>> {
         dots.repo("tmux/tmux.conf"),
         dots.home(".config/tmux/tmux.conf"),
     )])
+}
+
+/// Omarchy renderiza la plantilla en el tema activo y `zathurarc` incluye el
+/// resultado: los colores siguen al tema sin regenerar la config.
+fn zathura(dots: &Dots) -> Result<Vec<Op>> {
+    Ok(vec![
+        link(dots.repo("zathura"), dots.home(".config/zathura")),
+        link(
+            dots.repo("zathura/omarchy-theme.tpl"),
+            dots.home(".config/omarchy/themed/zathura.tpl"),
+        ),
+    ])
 }
 
 fn zsh(dots: &Dots) -> Result<Vec<Op>> {
@@ -261,16 +283,25 @@ fn claude_leftovers(dots: &Dots) -> Vec<Op> {
 /// Sólo la mecánica de versionado vive en el repo: `dots` es público y la
 /// bóveda, con sus notas, se queda en `~/Documents/Obsidian`.
 fn obsidian(dots: &Dots) -> Result<Vec<Op>> {
-    let units = dots.home(".config/systemd/user");
-
-    Ok(vec![
-        link(
-            dots.repo("obsidian/autocommit.sh"),
-            dots.home(".local/bin/obsidian-autocommit"),
+    let mut ops = vec![
+        link(dots.repo("obsidian/sync.sh"), dots.home(".local/bin/obsidian-sync")),
+        link_into(
+            dots.repo("obsidian/obsidian-sync.service"),
+            &dots.home(".config/systemd/user"),
         ),
-        link_into(dots.repo("obsidian/obsidian-autocommit.service"), &units),
-        link_into(dots.repo("obsidian/obsidian-autocommit.timer"), &units),
-    ])
+    ];
+    ops.extend(autocommit_leftovers(dots));
+
+    Ok(ops)
+}
+
+fn autocommit_leftovers(dots: &Dots) -> Vec<Op> {
+    AUTOCOMMIT_LEFTOVERS
+        .iter()
+        .map(|rel| dots.home(rel))
+        .filter(|dest| owned_link(dest, dots.root()))
+        .map(remove)
+        .collect()
 }
 
 fn walker_leftovers(dots: &Dots) -> Vec<Op> {
@@ -542,15 +573,52 @@ mod tests {
     }
 
     #[test]
-    fn obsidian_links_the_script_and_units_but_not_the_vault() {
+    fn zathura_links_the_config_and_the_theme_template() {
         let (_dir, dots) = pi_repo();
-        let units = dots.home(".config/systemd/user");
+
+        let found = links(&zathura(&dots).expect("plan"));
+
+        assert_eq!(
+            found,
+            [
+                (dots.repo("zathura"), dots.home(".config/zathura")),
+                (
+                    dots.repo("zathura/omarchy-theme.tpl"),
+                    dots.home(".config/omarchy/themed/zathura.tpl"),
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn obsidian_links_the_script_and_unit_but_not_the_vault() {
+        let (_dir, dots) = pi_repo();
 
         let found = dests(&obsidian(&dots).expect("plan"));
 
-        assert!(found.contains(&dots.home(".local/bin/obsidian-autocommit")));
-        assert!(found.contains(&units.join("obsidian-autocommit.service")));
-        assert!(found.contains(&units.join("obsidian-autocommit.timer")));
+        assert!(found.contains(&dots.home(".local/bin/obsidian-sync")));
+        assert!(found.contains(&dots.home(".config/systemd/user/obsidian-sync.service")));
         assert!(!found.contains(&dots.home("Documents/Obsidian")));
+    }
+
+    #[test]
+    fn obsidian_retires_the_autocommit_timer_links() {
+        let (dir, dots) = pi_repo();
+        let units = dots.home(".config/systemd/user");
+        let wants = units.join("timers.target.wants");
+        fs::create_dir_all(&wants).expect("units");
+        fs::create_dir_all(dots.home(".local/bin")).expect("bin");
+        fs::write(dir.path().join("elsewhere"), "").expect("foreign target");
+        unix::symlink(dots.root().join("obsidian/autocommit.sh"), dots.home(".local/bin/obsidian-autocommit")).expect("owned");
+        unix::symlink(dots.root().join("obsidian/obsidian-autocommit.timer"), units.join("obsidian-autocommit.timer")).expect("owned");
+        unix::symlink(units.join("obsidian-autocommit.timer"), wants.join("obsidian-autocommit.timer")).expect("enabled");
+        unix::symlink(dir.path().join("elsewhere"), units.join("obsidian-autocommit.service")).expect("foreign");
+
+        let removed = removals(&obsidian(&dots).expect("plan"));
+
+        assert!(removed.contains(&dots.home(".local/bin/obsidian-autocommit")));
+        assert!(removed.contains(&units.join("obsidian-autocommit.timer")));
+        assert!(removed.contains(&wants.join("obsidian-autocommit.timer")));
+        assert!(!removed.contains(&units.join("obsidian-autocommit.service")));
     }
 }
