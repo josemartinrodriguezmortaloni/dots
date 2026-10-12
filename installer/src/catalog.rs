@@ -15,7 +15,7 @@ pub struct Module {
     pub plan: fn(&Dots) -> Result<Vec<Op>>,
 }
 
-pub const MODULES: [Module; 13] = [
+pub const MODULES: [Module; 14] = [
     Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
     Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
     Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
@@ -26,6 +26,7 @@ pub const MODULES: [Module; 13] = [
     Module { key: "ohmyposh", desc: "Prompt oh-my-posh, tema star",                plan: ohmyposh },
     Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
+    Module { key: "claude",   desc: "Claude Code: CLAUDE.md, settings, MCP, guard y skills", plan: claude },
     Module { key: "pi",       desc: "Pi: AGENTS.md, settings, MCP, extensiones y skills", plan: pi },
     Module { key: "obsidian", desc: "Sincroniza la bóveda con GitHub",             plan: obsidian },
     Module { key: "mise",     desc: "Herramientas globales con mise (claude, pi…)", plan: mise },
@@ -53,16 +54,23 @@ const HYPR_LEGACY: [&str; 9] = [
     "monitors-esc.lua",
 ];
 
-/// Lo que el módulo `claude` enlazaba en `~/.claude` antes de que Pi lo
-/// reemplazara. Sólo se retiran los enlaces de este repo, nunca el estado de
-/// Claude Code (credenciales y sesiones), que `pi-claude-acp` sigue usando.
-const CLAUDE_LEGACY: [&str; 5] = [
-    "CLAUDE.md",
-    "statusline.sh",
-    "hooks",
-    "output-styles",
-    "rules",
-];
+/// Lo único de `~/.claude` que escribe el usuario. El resto es estado de
+/// Claude Code: credenciales, sesiones, plugins y el tema `omarchy.json`, que
+/// `omarchy-theme-set-claude` regenera en cada cambio.
+const CLAUDE_CONFIG: [&str; 3] = ["CLAUDE.md", "settings.json", "output-styles"];
+
+/// Los hooks `PreToolUse` de `claude/settings.json` corren las mismas reglas de
+/// riesgo que la extensión `guard` de Pi: el script vive con ella y Claude Code
+/// sólo lo enlaza.
+const GUARD_SCRIPT: &str = "pi/extensions/guard/guard-bash.sh";
+const GUARD_HOOK: &str = ".claude/hooks/guard-bash.sh";
+
+/// Los dos agentes leen las mismas skills, que viven una sola vez en el repo.
+const SHARED_SKILLS: &str = "pi/skills";
+
+/// `npx skills` instala acá las skills de terceros. Pi lee el directorio solo;
+/// Claude Code sólo mira `~/.claude/skills`.
+const AGENT_SKILLS: &str = ".agents/skills";
 
 /// Lo único de `~/.pi/agent` que escribe el usuario. El resto es estado de Pi
 /// o de sus paquetes: credenciales, sesiones, cachés, la instalación y el tema
@@ -72,10 +80,6 @@ const PI_CONFIG: [&str; 4] = ["AGENTS.md", "settings.json", "mcp.json", "statusl
 /// Directorios de `pi/` que se enlazan entrada por entrada: en `~/.pi/agent`
 /// conviven con lo que instalan `npx skills` y los paquetes de Pi.
 const PI_SHARED_DIRS: [&str; 2] = ["skills", "extensions"];
-
-/// Claude Code corre como backend de Pi. Su único setting apaga los plugins que
-/// claude.ai sincroniza, que se habilitan por defecto y traen sus propios MCP.
-const CLAUDE_SETTINGS: &str = ".claude/settings.json";
 
 /// Quattro sacó Walker: estos destinos quedaron huérfanos en instalaciones
 /// anteriores a la 4.0.
@@ -261,23 +265,36 @@ fn pi(dots: &Dots) -> Result<Vec<Op>> {
                 .map(|src| link_into(src, &target.join(dir))),
         );
     }
-    ops.push(link(dots.repo("pi/claude/settings.json"), dots.home(CLAUDE_SETTINGS)));
-    ops.extend(claude_leftovers(dots));
 
     Ok(ops)
 }
 
-fn claude_leftovers(dots: &Dots) -> Vec<Op> {
-    let claude = dots.home(".claude");
-    let skills = entries(&claude.join("skills")).unwrap_or_default();
-
-    CLAUDE_LEGACY
+/// Las skills se enlazan entrada por entrada: en `~/.claude/skills` conviven
+/// las del repo con las de terceros.
+fn claude(dots: &Dots) -> Result<Vec<Op>> {
+    let target = dots.home(".claude");
+    let mut ops: Vec<Op> = CLAUDE_CONFIG
         .iter()
-        .map(|name| claude.join(name))
-        .chain(skills)
-        .filter(|dest| owned_link(dest, dots.root()))
-        .map(remove)
-        .collect()
+        .map(|name| link_into(dots.repo("claude").join(name), &target))
+        .collect();
+
+    ops.push(link(dots.repo(GUARD_SCRIPT), dots.home(GUARD_HOOK)));
+    ops.extend(
+        skill_sources(dots)?
+            .into_iter()
+            .map(|src| link_into(src, &target.join("skills"))),
+    );
+
+    Ok(ops)
+}
+
+/// Un equipo recién clonado todavía no tiene skills de terceros: que falte el
+/// directorio no es un error.
+fn skill_sources(dots: &Dots) -> Result<Vec<PathBuf>> {
+    let mut found = dirs(&dots.home(AGENT_SKILLS)).unwrap_or_default();
+    found.extend(dirs(&dots.repo(SHARED_SKILLS))?);
+
+    Ok(found)
 }
 
 /// Sólo la mecánica de versionado vive en el repo: `dots` es público y la
@@ -539,28 +556,64 @@ mod tests {
         assert!(!found.contains(&agent.join("skills/README.md")));
         assert!(!found.contains(&agent.join("skills")));
         assert!(!found.contains(&agent.join("themes/omarchy-system.json")));
-        assert!(found.contains(&dots.home(CLAUDE_SETTINGS)));
     }
 
     #[test]
-    fn pi_retires_only_the_claude_links_this_repo_owns() {
-        let (dir, dots) = pi_repo();
-        let claude = dots.home(".claude");
-        fs::create_dir_all(claude.join("skills")).expect("skills");
-        fs::create_dir_all(dir.path().join("elsewhere")).expect("foreign target");
-        unix::symlink(dots.root().join("claude/CLAUDE.md"), claude.join("CLAUDE.md")).expect("owned");
-        unix::symlink(dots.root().join("claude/skills/locality"), claude.join("skills/locality")).expect("owned");
-        unix::symlink(dir.path().join("elsewhere"), claude.join("skills/foreign")).expect("foreign");
-        unix::symlink(dots.root().join("pi/claude/settings.json"), dots.home(CLAUDE_SETTINGS)).expect("current");
-        fs::write(claude.join(".credentials.json"), "{}").expect("state");
+    fn pi_leaves_the_claude_directory_to_the_claude_module() {
+        let (_dir, dots) = pi_repo();
+        let claude_dir = dots.home(".claude");
+        fs::create_dir_all(claude_dir.join("skills")).expect("skills");
+        unix::symlink(dots.repo("claude/CLAUDE.md"), claude_dir.join("CLAUDE.md")).expect("config");
+        unix::symlink(dots.repo("pi/skills/locality"), claude_dir.join("skills/locality")).expect("skill");
 
-        let removed = removals(&pi(&dots).expect("plan"));
+        let ops = pi(&dots).expect("plan");
 
-        assert!(removed.contains(&claude.join("CLAUDE.md")));
-        assert!(removed.contains(&claude.join("skills/locality")));
-        assert!(!removed.contains(&claude.join("skills/foreign")));
-        assert!(!removed.contains(&claude.join(".credentials.json")));
-        assert!(!removed.contains(&dots.home(CLAUDE_SETTINGS)));
+        assert!(!dests(&ops).iter().any(|dest| dest.starts_with(&claude_dir)));
+        assert!(removals(&ops).is_empty());
+    }
+
+    #[test]
+    fn claude_links_config_the_guard_hook_and_the_shared_skills() {
+        let (_dir, dots) = pi_repo();
+        let target = dots.home(".claude");
+
+        let found = links(&claude(&dots).expect("plan"));
+
+        for name in CLAUDE_CONFIG {
+            assert!(found.contains(&(dots.repo("claude").join(name), target.join(name))), "{name}");
+        }
+        assert!(found.contains(&(dots.repo(GUARD_SCRIPT), dots.home(GUARD_HOOK))));
+        assert!(found.contains(&(dots.repo("pi/skills/locality"), target.join("skills/locality"))));
+    }
+
+    #[test]
+    fn claude_links_the_third_party_skills_when_they_are_installed() {
+        let (_dir, dots) = pi_repo();
+        let installed = dots.home(AGENT_SKILLS);
+        let target = dots.home(".claude/skills");
+        assert!(!dests(&claude(&dots).expect("plan")).contains(&target.join("show-me")));
+
+        fs::create_dir_all(installed.join("show-me")).expect("skill");
+        fs::write(installed.join(".skill-lock.json"), "").expect("file");
+        let found = links(&claude(&dots).expect("plan"));
+
+        assert!(found.contains(&(installed.join("show-me"), target.join("show-me"))));
+        assert!(found.contains(&(dots.repo("pi/skills/locality"), target.join("locality"))));
+        assert!(!found.iter().any(|(_, dest)| *dest == target.join(".skill-lock.json")));
+    }
+
+    #[test]
+    fn claude_does_not_link_state_or_whole_shared_directories() {
+        let (_dir, dots) = pi_repo();
+        let target = dots.home(".claude");
+
+        let found = dests(&claude(&dots).expect("plan"));
+
+        assert!(!found.contains(&target.join("skills")));
+        assert!(!found.contains(&target.join("skills/README.md")));
+        assert!(!found.contains(&target.join("hooks")));
+        assert!(!found.contains(&target.join("themes/omarchy.json")));
+        assert!(!found.contains(&target.join(".credentials.json")));
     }
 
     #[test]

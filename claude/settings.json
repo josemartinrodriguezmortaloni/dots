@@ -1,0 +1,66 @@
+{
+  "model": "opus",
+  "effortLevel": "high",
+  "theme": "custom:omarchy",
+  "tui": "fullscreen",
+  "autoCompactEnabled": true,
+  "terminalProgressBarEnabled": true,
+  "permissions": {
+    "allow": [
+      "Bash(bat *)",
+      "Bash(rg *)",
+      "Bash(fd *)",
+      "Bash(sd *)",
+      "Bash(eza *)",
+      "Bash(ls *)",
+      "Bash(pwd *)",
+      "Bash(which *)",
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(bun *)",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(pip *)",
+      "Bash(cargo *)",
+      "Bash(go *)",
+      "Bash(make *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git add *)",
+      "Bash(git stash *)",
+      "mcp__engram__*",
+      "mcp__context7__*"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/guard-bash.sh\"",
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -c '{tool_input: {command: (\"cat \" + (.tool_input.file_path // \"\"))}}' | bash \"$HOME/.claude/hooks/guard-bash.sh\"",
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  },
+  "syncClaudeAiPlugins": false
+}

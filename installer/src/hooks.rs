@@ -18,7 +18,11 @@ const SYNC_SERVICE: &str = "obsidian-sync.service";
 /// cargado lo que ya corre.
 const AUTOCOMMIT_TIMER: &str = "obsidian-autocommit.timer";
 
-const HOOKS: [(&str, Hook); 8] = [
+/// El módulo `claude` enlaza este archivo; el script que registra los MCP vive
+/// a su lado en el repo, así que el enlace resuelto dice dónde encontrarlo.
+const CLAUDE_SETTINGS: &str = ".claude/settings.json";
+
+const HOOKS: [(&str, Hook); 9] = [
     ("hypr", reload_hyprland),
     ("waybar", restart_waybar),
     ("omarchy", apply_theme_hook),
@@ -27,6 +31,7 @@ const HOOKS: [(&str, Hook); 8] = [
     ("zathura", zathura_colors_hint),
     ("obsidian", enable_sync),
     ("mise", install_tools),
+    ("claude", register_mcp),
 ];
 
 /// Efectos que sólo tienen sentido después de que los enlaces existen.
@@ -103,6 +108,25 @@ fn install_tools(_home: &Path) -> Vec<String> {
         true => vec!["herramientas de mise instaladas".to_owned()],
         false => vec!["mise install falló: correlo a mano para ver el detalle".to_owned()],
     }
+}
+
+/// Los MCP de usuario viven en `~/.claude.json`, que es estado de Claude Code:
+/// sólo su CLI los escribe. Corre después de `mise`, que es quien lo instala.
+fn register_mcp(home: &Path) -> Vec<String> {
+    let Some(script) = mcp_script(home) else {
+        return Vec::new();
+    };
+
+    match sh::quiet("bash", &[&script.to_string_lossy()]) {
+        true => vec!["servidores MCP de Claude Code registrados".to_owned()],
+        false => vec![format!("{} falló: correlo a mano para ver el detalle", script.display())],
+    }
+}
+
+fn mcp_script(home: &Path) -> Option<std::path::PathBuf> {
+    let settings = std::fs::canonicalize(home.join(CLAUDE_SETTINGS)).ok()?;
+
+    sh::has_command("claude").then(|| settings.with_file_name("mcp.sh"))
 }
 
 fn shell_hint(_home: &Path) -> Vec<String> {

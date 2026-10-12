@@ -11,14 +11,14 @@
  ⠈⠻⢿⣿⣿⣿⠿⠋⢾⣿⣿⠇⠀⠀⠀⠘⠻⠿⠛⠀
 ```
 
-dots is the configuration of my Arch Linux machines: Hyprland on Omarchy Quattro, Neovim, Ghostty, tmux and Zsh, plus the Pi coding agent and a service that syncs my Obsidian vault with GitHub. A Rust installer links each module into `~/` and backs up every file it replaces. Terminal, editor, bar and multiplexer read their colors from the active Omarchy theme.
+dots is the configuration of my Arch Linux machines: Hyprland on Omarchy Quattro, Neovim, Ghostty, tmux and Zsh, plus the Pi and Claude Code coding agents and a service that syncs my Obsidian vault with GitHub. A Rust installer links each module into `~/` and backs up every file it replaces. Terminal, editor, bar and multiplexer read their colors from the active Omarchy theme.
 
 ## Highlights
 
 - **One theme switch:** Ghostty, Neovim, tmux, Waybar and Zathura follow the active Omarchy theme; Neovim reloads it live
 - **Safe installer:** a Rust/ratatui TUI that lists every file it displaces and moves it to `~/.dotfiles-backup/<timestamp>/`
 - **Per machine:** desktop and notebook share everything except the monitor layout
-- **Agents and notes:** Pi config with a command guard and the pi-statusline package, and a git sync service for the Obsidian vault
+- **Agents and notes:** Pi and Claude Code config sharing one command guard and one set of skills, the pi-statusline package, and a git sync service for the Obsidian vault
 
 <p>
   <a href="https://archlinux.org"><img alt="Arch Linux" src="https://img.shields.io/badge/ARCH-LINUX-0a0a0a.svg?style=for-the-badge&amp;logo=archlinux&amp;labelColor=000000" height="28"></a>
@@ -65,7 +65,8 @@ Each module is a set of symlinks from this repo to `~/`.
 | **ohmyposh** | `~/.config/ohmyposh/star.omp.json`                     | Prompt theme `star`                                                                               |
 | **themes**   | `~/.config/omarchy/themes/*`                           | Omarchy themes and the matching VS Code extension                                                 |
 | **omarchy**  | `~/.config/omarchy/{hooks,extensions,shell.toml}`      | `theme-set` hook (tmux/nvim), Quattro menu look, wallpaper pool shared by every theme             |
-| **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,statusline.json,skills/*,extensions/*}`, `~/.claude/settings.json` | Pi instructions, packages, MCP servers, statusline layout, own skills, the `guard` extension; Claude Code settings with the claude.ai-synced plugins off; removes the old `~/.claude` links |
+| **claude**   | `~/.claude/{CLAUDE.md,settings.json,output-styles,hooks/guard-bash.sh,skills/*}` | Claude Code instructions, settings (model, effort, theme, permissions, `guard` hooks, claude.ai plugin sync off), output styles; links the skills and the guard script of `pi/` and the third-party skills of `~/.agents/skills`; runs `claude/mcp.sh` to register the user MCP servers |
+| **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,statusline.json,skills/*,extensions/*}` | Pi instructions, packages, MCP servers, statusline layout, own skills, the `guard` extension |
 | **obsidian** | `~/.local/bin/obsidian-sync`, systemd user service     | Commits, pushes and pulls the vault `~/Documents/Obsidian` on every change                        |
 | **mise**     | `~/.config/mise/config.toml`                           | Global tools (claude, codex, gh, node, pi); runs `mise install` so every machine gets the same paths |
 
@@ -106,7 +107,7 @@ Gate every change before a commit:
 | Command                                              | Checks                                             |
 | ---------------------------------------------------- | -------------------------------------------------- |
 | `installer/check.sh`                                 | Installer tests, clippy, cyclomatic complexity < 4 |
-| `bash pi/extensions/guard/test-guard-bash.sh`        | Shell risk rules of the Pi guard                   |
+| `bash pi/extensions/guard/test-guard-bash.sh`        | Shell risk rules of the guard (Pi and Claude Code) |
 | `node --test pi/extensions/*/*.test.ts`              | Pi `guard` votes (Node 24+)                        |
 | `bash obsidian/test-sync.sh`                         | Vault sync between two clones and a bare remote    |
 
