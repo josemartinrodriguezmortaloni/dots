@@ -9,7 +9,6 @@ hl.config({
 		gaps_in = 4,
 		gaps_out = 10,
 		border_size = 1,
-		layout = "dwindle",
 		resize_on_border = true,
 	},
 })
