@@ -67,7 +67,7 @@ hl.animation({ leaf = "fadeLayers", enabled = true, speed = 3, bezier = "smooth"
 hl.config({
 	dwindle = {
 		preserve_split = true,
-		smart_split = true,
+		smart_split = false,
 		smart_resizing = true,
 	},
 
