@@ -1,41 +1,6 @@
 -- Start screen (estructura LazyVim extras/ui/mini-starter).
 -- Header propio; paths/items los podés ajustar vos.
--- Frase al azar y recientes del cwd: ahmedelgabri/dotfiles@c12ff76 (lua/_/dashboard.lua).
-
-local QUOTE_WIDTH = 60
-
----@param lines string[]
----@param word string
----@param width integer
-local function append_word(lines, word, width)
-  local candidate = vim.trim(lines[#lines] .. " " .. word)
-  if vim.fn.strdisplaywidth(candidate) <= width then
-    lines[#lines] = candidate
-  else
-    table.insert(lines, word)
-  end
-end
-
----Parte un texto en líneas de hasta `width` columnas, por palabras
----@param text string
----@param width integer
----@return string[]
-local function wrap(text, width)
-  local lines = { "" }
-  for word in text:gmatch("%S+") do
-    append_word(lines, word, width)
-  end
-  return lines
-end
-
----@return string
-local function quote_block()
-  local lines = {}
-  for _, line in ipairs(require("quotes").random()) do
-    vim.list_extend(lines, wrap(line, QUOTE_WIDTH))
-  end
-  return table.concat(lines, "\n")
-end
+-- Recientes del cwd: ahmedelgabri/dotfiles@c12ff76 (lua/_/dashboard.lua).
 
 ---Agrega `pad` a la sección de cada ítem para alinearla con las demás
 ---@param pad string
@@ -90,7 +55,7 @@ return {
       -- Conservá items que haya inyectado snacks_picker (ej. Projects)
       opts.items = vim.list_extend(items, opts.items or {})
       opts.evaluate_single = true
-      opts.header = logo .. "\n" .. quote_block()
+      opts.header = logo
       opts.content_hooks = {
         starter.gen_hook.adding_bullet(pad .. "░ ", false),
         starter.gen_hook.aligning("center", "center"),
