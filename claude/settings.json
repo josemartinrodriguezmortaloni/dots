@@ -62,5 +62,9 @@
       }
     ]
   },
-  "syncClaudeAiPlugins": false
+  "syncClaudeAiPlugins": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-pi.sh"
+  }
 }

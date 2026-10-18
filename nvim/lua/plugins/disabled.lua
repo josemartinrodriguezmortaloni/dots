@@ -8,7 +8,7 @@ return {
       },
     },
   },
-  -- Usamos mini.statusline (ver minit-statusline.lua)
+  -- Usamos una statusline propia (ver plugin/statusline.lua)
   { "nvim-lualine/lualine.nvim", enabled = false },
   {
     "folke/noice.nvim", enabled = false

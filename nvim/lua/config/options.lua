@@ -11,7 +11,7 @@ local o = vim.o
 o.background = require("omarchy.mode").background()
 o.number, o.relativenumber, o.cursorline, o.signcolumn = true, true, true, "yes:2"
 o.scrolloff, o.sidescrolloff, o.wrap, o.list = 8, 8, false, true
-o.termguicolors, o.showmode, o.laststatus = true, false, 2
+o.termguicolors, o.showmode = true, false
 o.splitright, o.splitbelow = true, true
 o.pumheight, o.winborder, o.pumborder = 12, "bold", "bold"
 
