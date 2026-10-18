@@ -39,3 +39,11 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo.tabstop, vim.bo.shiftwidth, vim.bo.softtabstop = 2, 2, 2
   end,
 })
+
+-- Resaltado al copiar con IncSearch (reemplaza el grupo de LazyVim)
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("lazyvim_highlight_yank", { clear = true }),
+  callback = function()
+    vim.hl.on_yank({ higroup = "IncSearch" })
+  end,
+})

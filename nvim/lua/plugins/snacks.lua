@@ -5,6 +5,16 @@ return {
       enabled = false, -- Disable scrolling animations
     },
     dashboard = { enabled = false },
+    -- Mensajes por UI2 (lua/config/options.lua)
+    notifier = { enabled = false },
+    -- Estilo de ahmedelgabri: fold, número, signo
+    statuscolumn = { left = { "fold" }, right = { "mark", "sign", "git" } },
+    -- Solo el bloque actual, como blink.indent de ahmedelgabri
+    indent = {
+      indent = { enabled = false },
+      scope = { char = "▎", hl = "Comment" },
+      animate = { enabled = false },
+    },
     picker = {
       sources = {
         projects = {
