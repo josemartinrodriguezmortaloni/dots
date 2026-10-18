@@ -1,5 +1,5 @@
 -- Quita el fondo de grupos de highlight puntuales para que se vea el de la terminal.
--- Complementa plugin/after/transparency.lua en grupos que ese archivo no cubre.
+-- Complementa lua/plugins/transparency.lua en grupos que ese archivo no cubre.
 local M = {}
 
 ---Quita el fondo de un grupo y conserva el resto de sus atributos

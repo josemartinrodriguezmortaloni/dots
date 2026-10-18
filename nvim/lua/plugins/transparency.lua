@@ -83,12 +83,20 @@ local function apply()
   end
 end
 
--- Reapply on every colorscheme change: loading a colorscheme repaints all
--- highlight groups, so a one-shot pass at startup is undone by the Omarchy
--- theme hot-reload or any later `:colorscheme`.
-vim.api.nvim_create_autocmd("ColorScheme", {
-  group = vim.api.nvim_create_augroup("transparency", { clear = true }),
-  callback = apply,
-})
-
-apply()
+-- Plugin local sin repo: `virtual` evita que lazy lo instale o lo agregue al rtp
+return {
+  {
+    "transparency",
+    virtual = true,
+    config = function()
+      -- Reapply on every colorscheme change: loading a colorscheme repaints all
+      -- highlight groups, so a one-shot pass at startup is undone by the Omarchy
+      -- theme hot-reload or any later `:colorscheme`.
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("transparency", { clear = true }),
+        callback = apply,
+      })
+      apply()
+    end,
+  },
+}

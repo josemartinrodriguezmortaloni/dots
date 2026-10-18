@@ -80,8 +80,6 @@ local LINE_NO_INDICATOR_CHARS = { "󰋙", "󰫃", "󰫄", "󰫅", "󰫆", "󰫇"
 
 local M = {}
 
-_G.Statusline = M
-
 ---@param parts table<number, any>
 ---@return string
 local function get_parts(parts)
@@ -453,14 +451,7 @@ local function redraw()
   vim.cmd.redrawstatus()
 end
 
-vim.o.statusline = "%!v:lua.Statusline.render()"
-update_laststatus()
-
-set_default_highlights()
-require("transparent").keep("StatusLineTransparent", TRANSPARENT_GROUPS)
-
-local group = vim.api.nvim_create_augroup("MyStatusLine", { clear = true })
-local autocmds = {
+local AUTOCMDS = {
   { "ColorScheme", set_default_highlights },
   { { "LspAttach", "LspDetach", "Progress" }, redraw },
   { "LspProgress", echo_lsp_progress },
@@ -471,6 +462,24 @@ local autocmds = {
   -- Diferido: en WinClosed la ventana sigue en la lista y en BufEnter el buftype puede no estar fijado
   { { "BufWinEnter", "BufEnter", "BufFilePost", "WinClosed", "TabEnter" }, vim.schedule_wrap(update_laststatus) },
 }
-for _, spec in ipairs(autocmds) do
-  vim.api.nvim_create_autocmd(spec[1], { group = group, pattern = spec[3], callback = spec[2] })
-end
+
+-- Plugin local sin repo: `virtual` evita que lazy lo instale o lo agregue al rtp
+return {
+  {
+    "statusline",
+    virtual = true,
+    config = function()
+      _G.Statusline = M
+      vim.o.statusline = "%!v:lua.Statusline.render()"
+      update_laststatus()
+
+      set_default_highlights()
+      require("transparent").keep("StatusLineTransparent", TRANSPARENT_GROUPS)
+
+      local group = vim.api.nvim_create_augroup("MyStatusLine", { clear = true })
+      for _, spec in ipairs(AUTOCMDS) do
+        vim.api.nvim_create_autocmd(spec[1], { group = group, pattern = spec[3], callback = spec[2] })
+      end
+    end,
+  },
+}

@@ -8,7 +8,7 @@ return {
       },
     },
   },
-  -- Usamos una statusline propia (ver plugin/statusline.lua)
+  -- Usamos una statusline propia (ver lua/plugins/statusline.lua)
   { "nvim-lualine/lualine.nvim", enabled = false },
   {
     "folke/noice.nvim", enabled = false

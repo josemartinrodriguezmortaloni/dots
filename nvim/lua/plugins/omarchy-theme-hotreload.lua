@@ -5,7 +5,6 @@ return {
 		lazy = false,
 		priority = 1000,
 		config = function()
-			local transparency_file = vim.fn.stdpath("config") .. "/plugin/after/transparency.lua"
 			local omarchy_current = vim.fs.normalize(vim.env.HOME .. "/.local/state/omarchy/current")
 			local debounce_ms = 120
 			local pending
@@ -87,14 +86,12 @@ return {
 							pcall(vim.cmd.colorscheme, colorscheme)
 							vim.cmd("redraw!")
 
-							if vim.fn.filereadable(transparency_file) == 1 then
-								vim.defer_fn(function()
-									vim.cmd.source(transparency_file)
-									vim.api.nvim_exec_autocmds("ColorScheme", { modeline = false })
-									vim.api.nvim_exec_autocmds("VimEnter", { modeline = false })
-									vim.cmd("redraw!")
-								end, 5)
-							end
+							-- El autocmd ColorScheme de plugins/transparency.lua reaplica la transparencia
+							vim.defer_fn(function()
+								vim.api.nvim_exec_autocmds("ColorScheme", { modeline = false })
+								vim.api.nvim_exec_autocmds("VimEnter", { modeline = false })
+								vim.cmd("redraw!")
+							end, 5)
 						end, 5)
 
 						break
