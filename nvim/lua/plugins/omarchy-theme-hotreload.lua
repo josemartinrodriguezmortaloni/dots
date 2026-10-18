@@ -64,7 +64,7 @@ return {
 				if vim.fn.exists("syntax_on") then
 					vim.cmd("syntax reset")
 				end
-				vim.o.background = "dark"
+				vim.o.background = require("omarchy.mode").background()
 
 				if theme_plugin then
 					local plugin_dir = theme_plugin.dir .. "/lua"

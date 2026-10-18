@@ -1,8 +1,5 @@
--- omarchy-theme-hotreload forces `vim.o.background = "dark"` before it applies a
--- theme, and Token picks its palette from that option, so the background is set
--- inside config() -- which runs after -- rather than in the spec. Token exposes
--- one colorscheme name per appearance; the light palette is reached through
--- `background`, not through a separate name.
+-- Token expone un solo nombre de colorscheme por diseño; la paleta clara sale de
+-- 'background', que nvim fija desde el `mode` de colors.toml (lua/omarchy/mode.lua).
 return {
   {
     "ThorstenRhau/token",
@@ -10,8 +7,6 @@ return {
     priority = 1000,
     config = function()
       require("token").setup({})
-      vim.o.background = "light"
-      vim.cmd.colorscheme("token-meridian")
     end,
   },
   {

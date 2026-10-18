@@ -1,0 +1,38 @@
+# Token Meridian (light, "Warm Parchment"). Surfaces come from the Token
+# palette's bg0..bg5 and fg0..fg3; every ANSI slot comes from
+# contrib/ghostty/token-meridian-light, so waybar, btop and the rest match the
+# terminal instead of drifting from it.
+mode = "light"
+
+accent = "#0048b3"
+selection = "#dedbd3"
+muted = "#a8a49c"
+
+background = "#fbf9f4"
+dark_background = "#f6f5f1"
+darker_background = "#ecebe7"
+lighter_background = "#f0ede6"
+
+foreground = "#28323a"
+dark_foreground = "#b5b2ab"
+light_foreground = "#46535f"
+bright_foreground = "#28323a"
+
+selection_background = "#dedbd3"
+selection_foreground = "#28323a"
+
+red = "#843900"
+yellow = "#843900"
+orange = "#843900"
+green = "#005f2f"
+cyan = "#095b62"
+blue = "#0048b3"
+magenta = "#7a1f7a"
+brown = "#524b42"
+
+bright_red = "#843900"
+bright_yellow = "#843900"
+bright_green = "#005f2f"
+bright_cyan = "#095b62"
+bright_blue = "#0048b3"
+bright_magenta = "#4b1fa3"
