@@ -33,5 +33,19 @@ return {
         },
       },
     },
+    image = {
+      enabled = true,
+      doc = {
+        inline = true,
+        float = true,
+        max_width = 120,
+        max_height = 60,
+        -- Oculta solo el código de los diagramas mermaid fuera del cursor
+        conceal = function(lang)
+          return lang == "mermaid"
+        end,
+      },
+      math = { enabled = false }, -- render-markdown maneja el LaTeX
+    },
   },
 }
