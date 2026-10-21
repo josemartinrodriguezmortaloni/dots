@@ -47,3 +47,12 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     vim.hl.on_yank({ higroup = "IncSearch" })
   end,
 })
+
+-- Revisar la ortografía en español.
+vim.api.nvim_create_autocmd("FileType", {
+  group = aug("spell_lang"),
+  pattern = { "markdown", "text", "gitcommit" },
+  callback = function()
+    vim.opt_local.spelllang = { "es" }
+  end,
+})
