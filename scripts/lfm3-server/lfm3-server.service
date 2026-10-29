@@ -1,0 +1,13 @@
+# systemd user unit: serve the LFM3 models (router) at boot.
+#   systemctl --user enable --now lfm3-server
+[Unit]
+Description=LFM3 llama-server router (OpenAI-compatible API on the LAN)
+
+[Service]
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
+ExecStart=%h/.config/scripts/lfm3-server/lfm3-server.sh --offline
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

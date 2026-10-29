@@ -66,9 +66,10 @@ Each module is a set of symlinks from this repo to `~/`.
 | **themes**   | `~/.config/omarchy/themes/*`                           | Omarchy themes and the matching VS Code extension                                                 |
 | **omarchy**  | `~/.config/omarchy/{hooks,extensions,shell.toml}`      | `theme-set` hook (tmux/nvim), Quattro menu look, wallpaper pool shared by every theme             |
 | **claude**   | `~/.claude/{CLAUDE.md,settings.json,output-styles,hooks/guard-bash.sh,skills/*}` | Claude Code instructions, settings (model, effort, theme, permissions, `guard` hooks, claude.ai plugin sync off), output styles; links the skills and the guard script of `pi/` and the third-party skills of `~/.agents/skills`; runs `claude/mcp.sh` to register the user MCP servers |
-| **pi**       | `~/.pi/agent/{AGENTS.md,settings.json,mcp.json,statusline.json,skills/*,extensions/*}` | Pi instructions, packages, MCP servers, statusline layout, own skills, the `guard` extension |
+| **pi**       | `~/.pi/agent/{SYSTEM.md,settings.json,statusline.json,skills/*,extensions/*}` | System prompt that drives the local model through the tools, packages, default model (`llama.cpp/lfm3-1.7b`), statusline layout, own skills, the `guard` extension |
 | **obsidian** | `~/.local/bin/obsidian-sync`, systemd user service     | Commits, pushes and pulls the vault `~/Documents/Obsidian` on every change                        |
 | **mise**     | `~/.config/mise/config.toml`                           | Global tools (claude, codex, gh, node, pi); runs `mise install` so every machine gets the same paths |
+| **scripts**  | `~/.config/scripts`, `~/.config/systemd/user/lfm3-server.service` | Own scripts (`op.sh`, playlistmaker, dddPython) and the `lfm3-server` llama.cpp router that serves the default Pi model; enable it with `systemctl --user enable --now lfm3-server` |
 
 `zed/` holds the Zed settings, keymap and themes; the installer does not link it.
 

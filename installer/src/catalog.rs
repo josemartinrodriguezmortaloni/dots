@@ -15,7 +15,7 @@ pub struct Module {
     pub plan: fn(&Dots) -> Result<Vec<Op>>,
 }
 
-pub const MODULES: [Module; 14] = [
+pub const MODULES: [Module; 15] = [
     Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
     Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
     Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
@@ -27,9 +27,10 @@ pub const MODULES: [Module; 14] = [
     Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
     Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
     Module { key: "claude",   desc: "Claude Code: CLAUDE.md, settings, MCP, guard y skills", plan: claude },
-    Module { key: "pi",       desc: "Pi: AGENTS.md, settings, MCP, extensiones y skills", plan: pi },
+    Module { key: "pi",       desc: "Pi: SYSTEM.md, settings, extensiones y skills", plan: pi },
     Module { key: "obsidian", desc: "Sincroniza la bóveda con GitHub",             plan: obsidian },
     Module { key: "mise",     desc: "Herramientas globales con mise (claude, pi…)", plan: mise },
+    Module { key: "scripts",  desc: "Scripts propios y servidor LFM3 (llama.cpp)", plan: scripts },
 ];
 
 const VSCODE_EXT: &str = ".vscode/extensions/thorstenrhau.token-vscode-themes-0.0.0";
@@ -75,7 +76,7 @@ const AGENT_SKILLS: &str = ".agents/skills";
 /// Lo único de `~/.pi/agent` que escribe el usuario. El resto es estado de Pi
 /// o de sus paquetes: credenciales, sesiones, cachés, la instalación y el tema
 /// `omarchy-system.json`, que `omarchy-theme-set-pi` regenera en cada cambio.
-const PI_CONFIG: [&str; 4] = ["AGENTS.md", "settings.json", "mcp.json", "statusline.json"];
+const PI_CONFIG: [&str; 3] = ["SYSTEM.md", "settings.json", "statusline.json"];
 
 /// Directorios de `pi/` que se enlazan entrada por entrada: en `~/.pi/agent`
 /// conviven con lo que instalan `npx skills` y los paquetes de Pi.
@@ -152,6 +153,18 @@ fn mise(dots: &Dots) -> Result<Vec<Op>> {
         dots.repo("mise/config.toml"),
         dots.home(".config/mise/config.toml"),
     )])
+}
+
+/// `.zshrc` y la unidad de `lfm3-server` llaman a los scripts por
+/// `~/.config/scripts`: el directorio se enlaza entero en esa ruta.
+fn scripts(dots: &Dots) -> Result<Vec<Op>> {
+    Ok(vec![
+        link(dots.repo("scripts"), dots.home(".config/scripts")),
+        link_into(
+            dots.repo("scripts/lfm3-server/lfm3-server.service"),
+            &dots.home(".config/systemd/user"),
+        ),
+    ])
 }
 
 fn ohmyposh(dots: &Dots) -> Result<Vec<Op>> {
@@ -638,6 +651,24 @@ mod tests {
                 (
                     dots.repo("zathura/omarchy-theme.tpl"),
                     dots.home(".config/omarchy/themed/zathura.tpl"),
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn scripts_links_the_directory_and_the_lfm3_unit() {
+        let (_dir, dots) = pi_repo();
+
+        let found = links(&scripts(&dots).expect("plan"));
+
+        assert_eq!(
+            found,
+            [
+                (dots.repo("scripts"), dots.home(".config/scripts")),
+                (
+                    dots.repo("scripts/lfm3-server/lfm3-server.service"),
+                    dots.home(".config/systemd/user/lfm3-server.service"),
                 ),
             ]
         );
