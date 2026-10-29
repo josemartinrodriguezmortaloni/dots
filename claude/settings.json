@@ -77,5 +77,7 @@
   "terminalProgressBarEnabled": true,
   "enabledPlugins": {
     "locus@locus": true
-  }
+  },
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }

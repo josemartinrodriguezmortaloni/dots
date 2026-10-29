@@ -12,12 +12,12 @@ vim.lsp.config("ty", {
     ty = {
       diagnosticMode = "openFilesOnly",
       inlayHints = {
-        variableTypes = true,
+        variableTypes = false,
         callArgumentNames = true,
       },
       completions = {
         autoImport = true,
-        completeFunctionParentheses = false,
+        completeFunctionParentheses = true,
       },
     },
   },

@@ -20,7 +20,7 @@ hl.config({
 		rounding_power = 2.4,
 
 		blur = {
-			enabled = true,
+			enabled = false,
 			size = 12,
 			passes = 4,
 			new_optimizations = true,
@@ -37,8 +37,6 @@ hl.config({
 			color_inactive = "rgba(00000025)",
 		},
 
-		active_opacity = 0.95,
-		inactive_opacity = 0.86,
 		fullscreen_opacity = 1.0,
 
 		dim_inactive = true,

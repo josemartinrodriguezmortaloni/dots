@@ -3,7 +3,7 @@ claude = "latest"
 codex = "latest"
 gh = "latest"
 node = "lts"
-opencode = "latest"
+opencode = { version = "latest", allow_builds = ["@opencode/cli"] }
 pi = "latest"
 
 [settings.upgrade]
