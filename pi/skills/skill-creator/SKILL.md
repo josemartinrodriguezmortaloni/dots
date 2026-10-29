@@ -143,16 +143,6 @@ Generic skill needs Prowler info?  → Add references/ pointing to Prowler docs
 
 ---
 
-## Registering the Skill
-
-After creating the skill, add it to `AGENTS.md`:
-
-```markdown
-| `{skill-name}` | {Description} | [SKILL.md](skills/{skill-name}/SKILL.md) |
-```
-
----
-
 ## Checklist Before Creating
 
 - [ ] Skill doesn't already exist (check `skills/`)
@@ -162,7 +152,6 @@ After creating the skill, add it to `AGENTS.md`:
 - [ ] Critical patterns are clear
 - [ ] Code examples are minimal
 - [ ] Commands section exists
-- [ ] Added to AGENTS.md
 
 ## Resources
 

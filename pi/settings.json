@@ -1,6 +1,6 @@
 {
-  "defaultModel": "opus",
-  "defaultProvider": "claude-acp",
+  "defaultModel": "lfm3-1.7b",
+  "defaultProvider": "llama.cpp",
   "lastChangelogVersion": "1.1.0",
   "npmCommand": [
     "mise",
@@ -11,14 +11,7 @@
   ],
   "packages": [
     "npm:gentle-engram@0.1.16",
-    {
-      "source": "../../Work/pp/ccp/pi-claude-acp",
-      "extensions": [
-        "+src/index.ts"
-      ]
-    },
     "npm:@upstash/context7-pi@0.1.2",
-    "npm:@alasano/pi-linear",
     "../../Work/pp/ccp/pi-markdown-rendering",
     "../../Work/pp/ccp/pi-codesanbox-execution",
     "../../Work/pp/ccp/pi-statusline"
@@ -39,25 +32,13 @@
   "defaultProjectTrust": "ask",
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
-  "warnings": {
-    "anthropicExtraUsage": true
-  },
-  "modelThinkingLevels": {
-    "claude-acp/opus": "high",
-    "claude-acp/default": "high"
-  },
   "defaultThinkingLevel": "high",
   "defaultTools": [
-    "+codemode"
+    "+grep",
+    "+find",
+    "+ls"
   ],
   "extensions": [
     "-builtin:mcp"
-  ],
-  "claudeAcp": {
-    "hiddenTools": [
-      "mem_*",
-      "resolve-library-id",
-      "query-docs"
-    ]
-  }
+  ]
 }

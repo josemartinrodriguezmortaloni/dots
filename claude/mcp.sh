@@ -2,9 +2,8 @@
 # Registra los servidores MCP de usuario de Claude Code. Viven en
 # ~/.claude.json, que es estado y queda fuera del repo: no se puede enlazar.
 #
-# pi/mcp.json declara los que Pi también le pasa a Claude Code (engram y
-# context7); mcp.json, los que sólo usa Claude Code. Linear entra por acá
-# porque en Pi lo provee el paquete pi-linear.
+# mcp.json los declara. En Pi, los paquetes gentle-engram y context7-pi
+# proveen engram y context7.
 #
 #   claude/mcp.sh    agrega los que faltan; los ya registrados no se tocan
 
@@ -15,7 +14,7 @@ STATE="$HOME/.claude.json"
 FAILED=()
 
 declared() {
-    jq -s 'map(.mcpServers) | add' "$HERE/../pi/mcp.json" "$HERE/mcp.json"
+    jq '.mcpServers' "$HERE/mcp.json"
 }
 
 registered() {

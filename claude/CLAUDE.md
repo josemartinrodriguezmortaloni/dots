@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Global instructions for Claude Code. Migrated from the Pi `AGENTS.md` on 2026-10-12.
+Global instructions for Claude Code.
 
 ## Identity & Dual Mission
 
