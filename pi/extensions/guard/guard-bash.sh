@@ -193,6 +193,15 @@ check_git() {
   return 1
 }
 
+# pip sobre el Python del sistema: el flag, la variable o la clave de config que saltan PEP 668
+# y pisan paquetes del gestor del sistema (pacman, apt).
+SYSTEM_PIP='(^|[[:space:]])--break-system-packages([[:space:]=]|$)|PIP_BREAK_SYSTEM_PACKAGES=|\.break-system-packages([[:space:]=]|$)'
+check_system_pip() {
+  [[ "$(strip_quotes "$1")" =~ $SYSTEM_PIP ]] || return 1
+  REASON="pip sobre el Python del sistema (--break-system-packages, PEP 668). Usá un venv o uv"
+  return 0
+}
+
 block() {
   {
     echo "🛑 guard-bash BLOQUEÓ un comando de riesgo."
@@ -226,7 +235,7 @@ norm="${norm//&/$'\n'}"
 REASON=""
 while IFS= read -r seg; do
   [ -z "${seg// /}" ] && continue
-  if check_rm "$seg" || check_secrets "$seg" || check_git "$seg"; then
+  if check_rm "$seg" || check_secrets "$seg" || check_git "$seg" || check_system_pip "$seg"; then
     block "$REASON"
   fi
 done <<< "$norm"

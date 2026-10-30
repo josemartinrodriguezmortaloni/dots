@@ -123,6 +123,19 @@ run 2 'git checkout -f'                 'git checkout -f (force)'
 run 2 'git checkout --force main'       'git checkout --force'
 
 # ───────────────────────────────────────────────────────────────────
+# BLOQUEAR (exit 2) — pip sobre el Python del sistema (PEP 668)
+# ───────────────────────────────────────────────────────────────────
+run 2 'pip install pytest --break-system-packages' 'pip install --break-system-packages (caso real de LFM3)'
+run 2 'pip install --break-system-packages -q pytest' 'flag antes del paquete'
+run 2 'python -m pip install --break-system-packages x' 'python -m pip'
+run 2 'sudo pip3 install --break-system-packages x' 'pip3 con sudo'
+run 2 'uv pip install --system --break-system-packages x' 'uv pip con el flag'
+run 2 'PIP_BREAK_SYSTEM_PACKAGES=1 pip install x' 'variable de entorno en vez del flag (bypass)'
+run 2 'export PIP_BREAK_SYSTEM_PACKAGES=1; pip install x' 'variable exportada en un compuesto'
+run 2 'pip config set global.break-system-packages true' 'clave de config persistente (bypass)'
+run 2 'cd /tmp && pip install --break-system-packages=1 x' 'flag con valor, en compuesto'
+
+# ───────────────────────────────────────────────────────────────────
 # PERMITIR (exit 0) — Borrado seguro / productividad
 # ───────────────────────────────────────────────────────────────────
 run 0 'rm file.txt'                     'rm de un archivo'
@@ -158,6 +171,11 @@ run 0 'git stash'                       'git stash (permitido por decisión)'
 run 0 'git status'                      'git status'
 run 0 'npm install'                     'npm install'
 run 0 'ls -la'                          'ls -la'
+run 0 'pip install -r requirements.txt' 'pip install sin el flag (venv activo)'
+run 0 'uv pip install pytest'          'uv pip install en un venv'
+run 0 '.venv/bin/pip install pytest'   'pip del venv por ruta'
+run 0 'echo "nunca uses --break-system-packages"' 'mensaje que menciona el flag (no lo usa)'
+run 0 'pip --version'                  'pip --version'
 
 # ───────────────────────────────────────────────────────────────────
 # RONDA ADVERSARIAL — bypasses más finos (BLOQUEAR)
