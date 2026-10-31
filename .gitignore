@@ -27,3 +27,6 @@ installer/target/
 
 # Claude Code
 .claude/worktrees/
+
+# Python
+__pycache__/

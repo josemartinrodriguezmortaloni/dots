@@ -1,0 +1,16 @@
+{
+  "phases": [
+    {"id": "1", "status": "ok", "evidence": "ls/find/grep listaron extensions/guard/: index.ts (9), policy.ts (40), guard-bash.sh (234), test-guard-bash.sh (204). checkPiTool (policy.ts:17) decide qué herramientas de Pi se chequean; guardCommand (policy.ts:25) hace spawnSync bash guard-bash.sh y falla cerrada (exit 2) si el guard no evalúa o falta jq."},
+    {"id": "2", "status": "passed", "evidence": "bun test policy.test.ts: 3 pass, 0 fail"},
+    {"id": "3", "status": "passed", "evidence": "bash test-guard-bash.sh: PASS=109 FAIL=0 (total 109)"},
+    {"id": "4", "status": "ok", "evidence": "split_commands.py + test_split_commands.py: 11 tests passed via python -m pytest"},
+    {"id": "5", "status": "ok", "evidence": "resolve-library-id /oven-sh/bun; bun test --test-name-pattern <name> o -t flag ejecuta un solo test por nombre de la CLI"},
+    {"id": "6", "status": "ok", "evidence": "model card: 24 layers (13 gated short convolutions, 5 sliding-window attention, 6 global attention); params 1.73B; sampling general (chat/agents): temperature=0.1, top_k=50, repetition_penalty=1.1; BFCL V4 71.39; MMLU-Pro no figura en la fuente"},
+    {"id": "7", "status": "ok", "evidence": "mem_search 'pi guard': sesión de migración pi/settings.json a ~/.claude, guard-bash hook bloquea cat .env, 3/3 tests pass"}
+  ],
+  "bun_tests": {"pass": 3, "fail": 0},
+  "guard_suite": {"pass": 109, "fail": 0},
+  "block_cases": 76,
+  "allow_cases": 34,
+  "unknowns": []
+}
