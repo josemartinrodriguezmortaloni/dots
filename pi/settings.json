@@ -41,5 +41,30 @@
   ],
   "extensions": [
     "-builtin:mcp"
+  ],
+  "skills": [
+    "!design-taste-frontend",
+    "!design-taste-frontend-v1",
+    "!gpt-taste",
+    "!high-end-visual-design",
+    "!industrial-brutalist-ui",
+    "!minimalist-ui",
+    "!redesign-existing-projects",
+    "!stitch-design-taste",
+    "!emil-design-eng",
+    "!image-to-code",
+    "!imagegen-frontend-mobile",
+    "!imagegen-frontend-web",
+    "!brandkit",
+    "!frontend-slides",
+    "!anatomy",
+    "!fframes-video",
+    "!remotion-best-practices",
+    "!find-skills",
+    "!skill-doctor",
+    "!build-egui-apps",
+    "!build-gpui-apps",
+    "!diagnose-crash",
+    "!hf-cli"
   ]
 }
