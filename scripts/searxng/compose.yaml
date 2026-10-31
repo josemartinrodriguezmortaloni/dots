@@ -1,0 +1,16 @@
+# Private SearXNG for pi-web-access. Listens on loopback only: 8080 is llama-server.
+# SEARXNG_SECRET comes from .env, which git ignores.
+services:
+  searxng:
+    image: docker.io/searxng/searxng:2026.10.29-c15647b5a
+    container_name: searxng
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8080"
+    env_file: .env
+    volumes:
+      - ./settings.yml:/etc/searxng/settings.yml:ro
+      - searxng-cache:/var/cache/searxng
+
+volumes:
+  searxng-cache:

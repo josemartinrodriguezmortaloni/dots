@@ -14,7 +14,8 @@
     "npm:@upstash/context7-pi@0.1.2",
     "../../Work/pp/ccp/pi-markdown-rendering",
     "../../Work/pp/ccp/pi-codesanbox-execution",
-    "../../Work/pp/ccp/pi-statusline"
+    "../../Work/pp/ccp/pi-statusline",
+    "npm:pi-web-access@0.46.0"
   ],
   "theme": "omarchy-system",
   "compaction": {
