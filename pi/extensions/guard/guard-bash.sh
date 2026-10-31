@@ -47,6 +47,32 @@ strip_quotes() {
   printf '%s' "$out"
 }
 
+# Estado de cita del recorrido de join_quoted_lines: vacío, ' o ". Una comilla distinta dentro
+# de otra es texto: "$Q$1" vale "" o '' al cerrar, y una comilla sola al abrir.
+Q=""
+track_quote() {
+  case "$Q$1" in
+    \"\"|\'\') Q="" ;;
+    \"|\') Q="$1" ;;
+  esac
+}
+
+# Un salto de línea entre comillas es parte del argumento (un mensaje de commit de varias líneas),
+# no un corte de segmento: pasa a espacio. Fuera de comillas sigue cortando.
+# Recorre bytes (LC_ALL=C): en UTF-8 ningún byte de un carácter multibyte es una comilla ni un
+# salto de línea, y con el locale UTF-8 ${s:i:1} cuesta O(i) y un heredoc largo tarda segundos.
+join_quoted_lines() {
+  local LC_ALL=C s="$1" out="" c i
+  Q=""
+  for ((i = 0; i < ${#s}; i++)); do
+    c="${s:i:1}"
+    track_quote "$c"
+    [ -n "$Q" ] && c="${c//$'\n'/ }"
+    out+="$c"
+  done
+  printf '%s' "$out"
+}
+
 # ¿El token es un objetivo catastrófico para un borrado recursivo?
 is_danger_target() {
   local t; t="$(strip_q "$1")"
@@ -225,7 +251,7 @@ cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)"
 [ -z "$cmd" ] && exit 0
 
 # Normalizar separadores de shell a saltos de línea para evaluar por segmentos.
-norm="$cmd"
+norm="$(join_quoted_lines "$cmd")"
 norm="${norm//&&/$'\n'}"
 norm="${norm//||/$'\n'}"
 norm="${norm//|/$'\n'}"

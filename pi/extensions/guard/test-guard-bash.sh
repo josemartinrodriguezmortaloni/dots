@@ -203,6 +203,16 @@ run 0 'dd if=/dev/zero of=/tmp/f bs=1M count=1' 'dd sin secreto'
 run 0 '/bin/ls -la'                    'ls por ruta absoluta (benigno)'
 run 0 'gpg --version'                  'gpg --version (sin secreto)'
 run 0 'git checkout -b release/1.2--rc' 'crear branch con -- en el nombre'
+run 0 $'git commit -m "fix(pi): guard\n\nLFM3 corrió pip install --break-system-packages sin permiso."' 'mensaje de commit multilínea que menciona el flag de pip'
+run 0 $'git commit -m "docs: riesgos\n\ngit reset --hard descarta cambios."' 'mensaje de commit multilínea que menciona git reset --hard'
+run 0 $'git commit -m \'nota\n\nnunca: rm -rf ~\'' 'mensaje multilínea con comillas simples'
+
+# ───────────────────────────────────────────────────────────────────
+# RONDA ADVERSARIAL — el salto de línea fuera de comillas sigue cortando (BLOQUEAR)
+# ───────────────────────────────────────────────────────────────────
+run 2 $'echo "listo"\nrm -rf ~'         'rm tras una línea con comillas ya cerradas'
+run 2 $'git commit -m "a\nb"\ngit reset --hard' 'reset --hard después de un mensaje multilínea'
+run 2 $'echo "it\'s"\ncat .env'         'comilla simple dentro de dobles no abre una cita'
 
 # ───────────────────────────────────────────────────────────────────
 # FAIL-CLOSED — sin jq el guard NO debe dejar pasar lo catastrófico
