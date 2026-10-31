@@ -80,40 +80,15 @@ hl.config({
 	},
 })
 
--- Frosted glass for quickshell surfaces. ignore_alpha keeps the blur on the
--- drawn shape instead of the rectangular layer surface.
-for _, namespace in ipairs({
-	"qs-bar",
-	"qs-launcher",
-	"qs-passprompt",
-	"qs-nowplaying",
-	"qs-notes",
-	"qs-wifi",
-	"qs-notify",
-	"qs-toasts",
-	"qs-theme",
-	"qs-osd",
-	-- Default-namespace panels (power, sysmon, battery, clipboard, fetch, clock,
-	-- screentime, phone, drives, watchcat, failwatch, keybinds).
-	"quickshell",
-}) do
-	hl.layer_rule({ match = { namespace = namespace }, blur = true, ignore_alpha = 0.15 })
-end
-
 -- Hornet pet: only the PNG is visible, with no background, blur or shadow.
 hl.layer_rule({ match = { namespace = "qs-pet" }, blur = false, ignore_alpha = 0.01, no_anim = true, xray = true })
 
--- Zathura as a floating glass panel: blur shows the wallpaper through the page.
--- The third opacity value applies in fullscreen; without it fullscreen is opaque.
--- override keeps these values exact: without it they multiply with
--- decoration.active_opacity and inactive_opacity.
+-- Zathura as a centered floating panel.
 o.window("^(org.pwmt.zathura)$", {
-	tag = "-default-opacity",
 	float = true,
 	center = true,
 	size = { 1100, 750 },
 	border_size = 0,
-	opacity = "0.78 override 0.70 override 0.78 override",
 })
 
 -- A theme may ship its own looknfeel.lua (e.g. themes/industrial). Loaded last,
