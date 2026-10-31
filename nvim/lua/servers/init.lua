@@ -1,17 +1,30 @@
--- Ajustes de servidores. Cada módulo solo llama a vim.lsp.config(): el ciclo de vida
--- (instalación con mason y vim.lsp.enable) lo resuelve LazyVim desde opts.servers.
--- Lo carga lua/plugins/lsp.lua en su init, antes de que LazyVim aplique sus propios opts.
+-- Ajustes y ciclo de vida de los servidores LSP. Cada módulo solo llama a
+-- vim.lsp.config(); nvim-lspconfig aporta los defaults (lsp/<nombre>.lua) y
+-- mason instala los binarios que faltan (plugin/mason.lua).
+-- Lo carga plugin/lsp.lua.
 for _, module in ipairs({
   "lua_ls",
   "pythonls",
-  "gopls",
   "jsonls",
   "ts_ls",
   "bashls",
   "dockerls",
-  "emmet_ls",
   "yamlls",
   "tailwindcss",
 }) do
   require("servers." .. module)
 end
+
+-- rust-analyzer no va acá: lo arranca rustaceanvim (plugin/rust.lua)
+vim.lsp.enable({
+  "lua_ls",
+  "ty",
+  "ruff",
+  "jsonls",
+  "ts_ls",
+  "bashls",
+  "dockerls",
+  "yamlls",
+  "tailwindcss",
+  "clangd",
+})

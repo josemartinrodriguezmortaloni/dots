@@ -1,0 +1,263 @@
+local utils = require 'utils'
+
+local M = {}
+
+---@param parts table<number, any>
+---@return string
+function M.get_parts(parts)
+	return table.concat(
+		vim.tbl_filter(function(item)
+			return type(item) == 'string'
+		end, parts),
+		' '
+	)
+end
+
+---@return string[] Array of [base, filename, prefix]
+local function get_filepath_parts()
+	local full = vim.fn.expand '%:~:.'
+	local base = vim.fn.fnamemodify(full, ':h')
+	local filename = vim.fn.fnamemodify(full, ':t')
+	local prefix = (base == '' or base == '.') and '' or base .. '/'
+
+	return { base, filename, prefix }
+end
+
+local line_no_indicator_chars =
+	{ '󰋙', '󰫃', '󰫄', '󰫅', '󰫆', '󰫇', '󰫈' }
+
+---Display lineNoIndicator (from drzel/vim-line-no-indicator)
+---@return string
+local function line_no_indicator()
+	local current_line = vim.fn.line '.'
+	local total_lines = vim.fn.line '$'
+	local index = current_line
+
+	if current_line == 1 then
+		index = 1
+	elseif current_line == total_lines then
+		index = #line_no_indicator_chars
+	else
+		local line_no_fraction = math.floor(current_line) / math.floor(total_lines)
+		index = math.ceil(line_no_fraction * #line_no_indicator_chars)
+	end
+
+	return line_no_indicator_chars[index]
+end
+
+---@param data {buf: number}
+function M.format_diff_summary(data)
+	local summary = vim.b[data.buf].minidiff_summary
+
+	if summary == nil then
+		return nil
+	end
+
+	local t = {}
+
+	if summary.add and summary.add > 0 then
+		table.insert(t, '%#StatusLineDiffAdd#+' .. summary.add .. '%*')
+	end
+
+	if summary.change and summary.change > 0 then
+		table.insert(t, '%#StatusLineDiffChange#~' .. summary.change .. '%*')
+	end
+
+	if summary.delete and summary.delete > 0 then
+		table.insert(t, '%#StatusLineDiffDelete#-' .. summary.delete .. '%*')
+	end
+
+	vim.b[data.buf].minidiff_summary_string = table.concat(t, ' ')
+end
+
+---@return string?
+function M.git_info()
+	if not vim.g.loaded_fugitive then
+		return nil
+	end
+
+	local out = vim.fn.FugitiveHead(10)
+
+	if out ~= '' then
+		out = string.format('%s %s', utils.get_icon 'branch', out)
+	end
+
+	return type(out) == 'string'
+			and out ~= ''
+			and string.format('%%#User6#%s%%*', out)
+		or nil
+end
+
+---@return string
+function M.filepath()
+	local parts = get_filepath_parts()
+	local prefix = parts[3]
+	local filename = parts[2]
+	local highlight = 'User4'
+
+	if vim.bo.modified then
+		highlight = 'StatusLineModified'
+	end
+
+	local line = '%#' .. highlight .. '#%f%*'
+
+	if vim.fn.empty(prefix) ~= 1 and vim.fn.empty(filename) ~= 1 then
+		line = string.format('%s%%*%%#%s#%s%%*', prefix, highlight, filename)
+	end
+
+	return string.format('%%#%s#%s%%*', 'LineNr', line)
+end
+
+---@return string?
+function M.readonly()
+	local is_modifiable = vim.bo.modifiable == true
+	local is_readonly = vim.bo.readonly == true
+	local line = nil
+
+	if not is_modifiable and is_readonly then
+		line = string.format('%s RO', utils.get_icon 'lock')
+	end
+
+	if is_modifiable and is_readonly then
+		line = 'RO'
+	end
+
+	if not is_modifiable and not is_readonly then
+		line = utils.get_icon 'lock'
+	end
+
+	return line and string.format('%%5* %s %%w %%*', line) or nil
+end
+
+---Note that: \19 = ^S and \22 = ^V.
+---@type table<string, string>
+local MODES = {
+	no = 'N-Operator Pending',
+	nov = 'N-Operator Block',
+	noV = 'N-Operator Line',
+	v = 'V.',
+	V = 'V·Line',
+	['\22'] = 'V·Block',
+	s = 'S.',
+	S = 'S·Line',
+	['\19'] = 'S·Block',
+	i = 'I.',
+	ic = 'I·Compl',
+	ix = 'I·X-Compl',
+	R = 'R.',
+	Rc = 'Compl·Replace',
+	Rx = 'V·Replace',
+	Rv = 'X-Compl·Replace',
+	c = 'Command',
+	cv = 'Vim Ex',
+	ce = 'Ex',
+	r = 'Prompt',
+	rm = 'More',
+	['r?'] = 'Confirm',
+	['!'] = 'Sh',
+	t = 'T.',
+	nt = 'TN.',
+}
+
+---@return string?
+function M.mode()
+	local current_mode = vim.api.nvim_get_mode().mode
+
+	if current_mode == 'n' then
+		return nil
+	end
+
+	return MODES[current_mode] or 'Unknown'
+end
+
+---@return string
+function M.rhs()
+	if vim.fn.winwidth(0) <= 80 then
+		return line_no_indicator()
+	end
+
+	local total = vim.fn.line '$'
+	local width = #tostring(total)
+	local pos = string.format(
+		'%' .. width .. 'd/%d:%-2d',
+		vim.fn.line '.',
+		total,
+		vim.fn.col '.'
+	)
+
+	return M.get_parts {
+		string.format('%%#User4#%s%%*', pos),
+		'%#User4#' .. line_no_indicator() .. '%*',
+	}
+end
+
+---@return string?
+function M.spell()
+	if vim.wo.spell then
+		return string.format('%%#WarningMsg#%s%%*', utils.get_icon 'spell')
+	end
+	return nil
+end
+
+---@return string?
+function M.paste()
+	if vim.o.paste then
+		return string.format('%%#ErrorMsg#%s%%*', utils.get_icon 'paste')
+	end
+	return nil
+end
+
+---@return string
+function M.file_info()
+	local data = {
+		vim.bo.filetype:upper(),
+		vim.bo.fileformat ~= 'unix' and vim.bo.fileformat or nil,
+		vim.bo.fileencoding ~= 'utf-8' and vim.bo.fileencoding or nil,
+	}
+
+	return M.get_parts(data)
+end
+
+---@return string?
+function M.word_count()
+	if vim.bo.filetype == 'text' then
+		return string.format(
+			'%%#User4#%d %s%%*',
+			vim.fn.wordcount()['words'],
+			'words'
+		)
+	end
+
+	return nil
+end
+
+---@return string?
+function M.git_conflicts()
+	if
+		vim.bo.filetype == 'ministarter' or vim.bo.filetype == 'snacks_dashboard'
+	then
+		return nil
+	end
+
+	-- Count "^<<<<<<< " rather than "^=======$": a bare ======= line occurs in
+	-- normal text (Markdown/RST setext headings), the start marker does not.
+	-- The timeout keeps huge buffers from stalling statusline redraws.
+	local result = vim.fn.searchcount {
+		pattern = [[^<<<<<<< ]],
+		recompute = 1,
+		maxcount = 99,
+		timeout = 50,
+	}
+
+	if (result.total or 0) == 0 then
+		return nil
+	end
+
+	return string.format(
+		'%%#DiagnosticSignError#%s%s%%*',
+		utils.get_icon 'conflict',
+		result.total
+	)
+end
+
+return M

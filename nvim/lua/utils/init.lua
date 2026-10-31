@@ -1,0 +1,135 @@
+local M = {}
+
+-- Built once at module load: the env var cannot change mid-session and
+-- get_icon is called several times per statusline redraw.
+local ICONS = {
+	paste = '⍴',
+	spell = '✎',
+	branch = vim.env.PROMPT_GIT_BRANCH ~= nil and vim.fn.trim(
+		vim.env.PROMPT_GIT_BRANCH
+	) or '',
+	error = '×',
+	info = '𝒾',
+	warn = '⚐',
+	hint = '•',
+	lock = '',
+	conflict = ' ',
+	success = ' ',
+	virtual = '●',
+	search = '   ',
+	ellipsis = '… ',
+}
+
+function M.get_icon(icon_name)
+	return ICONS[icon_name] or ''
+end
+
+function M.plaintext()
+	vim.wo.linebreak = true
+	vim.wo.list = false
+	vim.bo.expandtab = true
+
+	if vim.bo.filetype ~= 'markdown' then
+		vim.wo.wrap = true
+	end
+
+	if vim.bo.filetype == 'gitcommit' then
+		-- Git commit messages body are constraied to 72 characters
+		vim.bo.textwidth = 72
+	else
+		vim.bo.textwidth = 0
+		vim.bo.wrapmargin = 0
+	end
+
+	-- Break undo sequences into chunks (after punctuation); see: `:h i_CTRL-G_u`
+	-- https://twitter.com/vimgifs/status/913390282242232320
+	vim.keymap.set({ 'i' }, '.', '.<c-g>u', { buf = 0 })
+	vim.keymap.set({ 'i' }, '?', '?<c-g>u', { buf = 0 })
+	vim.keymap.set({ 'i' }, '!', '!<c-g>u', { buf = 0 })
+	vim.keymap.set({ 'i' }, ',', ',<c-g>u', { buf = 0 })
+end
+
+function M.get_border(highlight)
+	-- single border but heavier and with custom highlight when needed
+	-- https://github.com/neovim/neovim/blob/99e0facf3a001608287ec6db69b01c77443c7b9d/src/nvim/api/win_config.c#L935C19-L935C57
+	return {
+		{ '┏', highlight or 'FloatBorder' },
+		{ '━', highlight or 'FloatBorder' },
+		{ '┓', highlight or 'FloatBorder' },
+		{ '┃', highlight or 'FloatBorder' },
+		{ '┛', highlight or 'FloatBorder' },
+		{ '━', highlight or 'FloatBorder' },
+		{ '┗', highlight or 'FloatBorder' },
+		{ '┃', highlight or 'FloatBorder' },
+	}
+end
+
+-- Some LSP are part of npm packages, so the binaries live inside node_modules/.bin
+-- this function helps getting the correct path to the binary and falling
+-- back to a global binary if none is found in the local node_modules
+function M.get_lsp_bin(bin)
+	-- Get the closest `node_modules` first
+	local root = vim.fs.root(0, 'node_modules/.bin')
+	local bin_path = string.format('%s/.bin/%s', root, bin)
+
+	if vim.uv.fs_stat(bin_path) ~= nil then
+		return bin_path
+	end
+
+	-- Then maybe we might be in a monorepo, so get the root `node_modules`, maybe it's hoisted up there
+	root = vim.fs.root(0, '.git')
+	bin_path = string.format('%s/node_modules/.bin/%s', root, bin)
+
+	if vim.uv.fs_stat(bin_path) ~= nil then
+		return bin_path
+	end
+
+	if vim.fn.executable(bin) == 1 then
+		return bin
+	end
+
+	return nil
+end
+
+function M.append(option, list)
+	return table.concat({ option, unpack(list) }, ',')
+end
+
+function M.prepend(option, list)
+	return table.concat({ unpack(list), option }, ',')
+end
+
+function M.remove(option, item)
+	return vim
+		.iter(vim.split(option, ','))
+		:filter(function(p)
+			return p ~= item
+		end)
+		:join ','
+end
+
+-- Returns an on_dir-style root_dir callback resolving the project root from
+-- the given markers; with_buf_name appends the buffer's own file as a
+-- last-priority marker so standalone files still get a workspace (vim.fs.root
+-- treats list order as priority, so it must come last).
+function M.root_for(markers, opts)
+	local with_buf_name = opts and opts.with_buf_name
+
+	return function(_bufnr, on_dir)
+		local search = markers
+		if with_buf_name then
+			search = { unpack(markers) }
+			search[#search + 1] = vim.api.nvim_buf_get_name(0)
+		end
+
+		local root = vim.fs.root(0, search)
+
+		if root then
+			on_dir(root)
+		end
+	end
+end
+
+M.web_roots = M.root_for({ 'package.json', '.git' }, { with_buf_name = true })
+
+return M
