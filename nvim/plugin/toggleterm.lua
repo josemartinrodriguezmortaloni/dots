@@ -7,6 +7,8 @@ end
 require("toggleterm").setup({
   size = 20,
   direction = "float",
+  -- winblend 0 y sin shading: plugin/transparency.lua es el único que escribe
+  -- Normal/NormalFloat de estos buffers.
   float_opts = { border = "curved", winblend = 0 },
   shade_terminals = false,
   start_in_insert = true,

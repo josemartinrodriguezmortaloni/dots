@@ -1,6 +1,7 @@
 -- Reaplica el Tema de Omarchy en vivo. Dos disparadores: el hook
 -- ~/.config/omarchy/hooks/theme-set (vía nvim --remote-expr) y un watcher
--- sobre ~/.local/state/omarchy/current.
+-- sobre ~/.local/state/omarchy/current. El ColorScheme resultante dispara la
+-- transparencia de plugin/transparency.lua.
 local OMARCHY_CURRENT = vim.fs.normalize(vim.env.HOME .. "/.local/state/omarchy/current")
 local DEBOUNCE_MS = 120
 local WATCHED = { ["theme.name"] = true, theme = true }

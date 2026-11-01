@@ -23,6 +23,14 @@ local CLEAN_SOURCE_NAMES = {
   ["Lua Syntax Check."] = "lua",
 }
 
+-- El ícono del texto virtual va sin el fondo que le pone el tema
+local TRANSPARENT_GROUPS = {
+  "DiagnosticVirtualTextError",
+  "DiagnosticVirtualTextWarn",
+  "DiagnosticVirtualTextInfo",
+  "DiagnosticVirtualTextHint",
+}
+
 local HOVER_LIMITS = { max_width = 80, max_height = 20 }
 
 ---Borde grueso con highlight propio
@@ -56,6 +64,7 @@ local function color_float_border()
 end
 
 local function limit_hover_size()
+require("transparent").keep("DiagnosticTransparent", TRANSPARENT_GROUPS)
   local open_floating_preview = vim.lsp.util.open_floating_preview
   vim.lsp.util.open_floating_preview = function(contents, syntax, opts)
     if opts and opts.focus_id == "textDocument/hover" then
