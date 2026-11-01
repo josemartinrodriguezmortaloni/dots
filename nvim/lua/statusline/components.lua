@@ -207,9 +207,21 @@ function M.paste()
 	return nil
 end
 
+---Ícono del tipo de archivo con su color, según nvim-web-devicons
+---@return string
+local function filetype_icon()
+	local icon, hl = require('nvim-web-devicons').get_icon(
+		vim.fn.expand '%:t',
+		nil,
+		{ default = true }
+	)
+	return string.format('%%#%s#%s%%*', hl, icon)
+end
+
 ---@return string
 function M.file_info()
 	local data = {
+		filetype_icon(),
 		vim.bo.filetype:upper(),
 		vim.bo.fileformat ~= 'unix' and vim.bo.fileformat or nil,
 		vim.bo.fileencoding ~= 'utf-8' and vim.bo.fileencoding or nil,
