@@ -1,7 +1,7 @@
 mod app;
+mod art;
 mod catalog;
 mod cli;
-mod donut;
 mod dots;
 mod hooks;
 mod layout;

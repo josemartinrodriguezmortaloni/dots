@@ -57,8 +57,8 @@ fn module_for(key: &str) -> Result<&'static Module> {
 }
 
 fn build(dots: &Dots, module: &'static Module) -> Result<Step> {
-    let ops = (module.plan)(dots)
-        .with_context(|| format!("no se pudo planificar {}", module.key))?;
+    let ops =
+        (module.plan)(dots).with_context(|| format!("no se pudo planificar {}", module.key))?;
 
     Ok(Step {
         key: module.key,

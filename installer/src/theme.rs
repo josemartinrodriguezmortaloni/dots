@@ -18,7 +18,6 @@ pub struct Palette {
     pub red: Color,
     pub green: Color,
     pub yellow: Color,
-    pub selection: Color,
 }
 
 pub fn load(dots: &Dots) -> Palette {
@@ -84,7 +83,6 @@ fn palette(map: &HashMap<String, String>) -> Palette {
         red: pick(map, "red"),
         green: pick(map, "green"),
         yellow: pick(map, "yellow"),
-        selection: pick(map, "selection_background"),
     }
 }
 
@@ -106,7 +104,7 @@ fn rgb(hex: &str) -> Option<Color> {
 }
 
 impl Palette {
-    /// Mezcla entre el fondo y el acento. La rampa del donut ya codifica
+    /// Mezcla entre el fondo y el acento. El brillo del arte ya codifica
     /// luminancia, así que el gradiente sale del dato que el render calcula.
     pub fn glow(&self, amount: f32) -> Color {
         mix(self.background, self.accent, amount)

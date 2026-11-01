@@ -16,21 +16,81 @@ pub struct Module {
 }
 
 pub const MODULES: [Module; 15] = [
-    Module { key: "nvim",     desc: "Neovim 0.11+ con tema Vesper",                plan: nvim },
-    Module { key: "ghostty",  desc: "Emulador de terminal Ghostty",                plan: ghostty },
-    Module { key: "hypr",     desc: "Compositor Hyprland (Omarchy Quattro Lua)",   plan: hypr },
-    Module { key: "waybar",   desc: "Barra de estado Waybar",                      plan: waybar },
-    Module { key: "tmux",     desc: "Tmux con prefijo C-Space",                    plan: tmux },
-    Module { key: "zathura",  desc: "Visor PDF Zathura con colores del tema",      plan: zathura },
-    Module { key: "zsh",      desc: "Zsh + Zinit + oh-my-posh",                    plan: zsh },
-    Module { key: "ohmyposh", desc: "Prompt oh-my-posh, tema star",                plan: ohmyposh },
-    Module { key: "themes",   desc: "Temas Omarchy (Token Meridian claro/oscuro)", plan: themes },
-    Module { key: "omarchy",  desc: "Hook theme-set y menú Quattro",               plan: omarchy },
-    Module { key: "claude",   desc: "Claude Code: CLAUDE.md, settings, MCP, guard y skills", plan: claude },
-    Module { key: "pi",       desc: "Pi: SYSTEM.md, settings, extensiones y skills", plan: pi },
-    Module { key: "obsidian", desc: "Sincroniza la bóveda con GitHub",             plan: obsidian },
-    Module { key: "mise",     desc: "Herramientas globales con mise (claude, pi…)", plan: mise },
-    Module { key: "scripts",  desc: "Scripts propios y servidor LFM3 (llama.cpp)", plan: scripts },
+    Module {
+        key: "nvim",
+        desc: "Neovim 0.11+ con tema Vesper",
+        plan: nvim,
+    },
+    Module {
+        key: "ghostty",
+        desc: "Emulador de terminal Ghostty",
+        plan: ghostty,
+    },
+    Module {
+        key: "hypr",
+        desc: "Compositor Hyprland (Omarchy Quattro Lua)",
+        plan: hypr,
+    },
+    Module {
+        key: "waybar",
+        desc: "Barra de estado Waybar",
+        plan: waybar,
+    },
+    Module {
+        key: "tmux",
+        desc: "Tmux con prefijo C-Space",
+        plan: tmux,
+    },
+    Module {
+        key: "zathura",
+        desc: "Visor PDF Zathura con colores del tema",
+        plan: zathura,
+    },
+    Module {
+        key: "zsh",
+        desc: "Zsh + Zinit + oh-my-posh",
+        plan: zsh,
+    },
+    Module {
+        key: "ohmyposh",
+        desc: "Prompt oh-my-posh, tema star",
+        plan: ohmyposh,
+    },
+    Module {
+        key: "themes",
+        desc: "Temas Omarchy (Token Meridian claro/oscuro)",
+        plan: themes,
+    },
+    Module {
+        key: "omarchy",
+        desc: "Hook theme-set y menú Quattro",
+        plan: omarchy,
+    },
+    Module {
+        key: "claude",
+        desc: "Claude Code: CLAUDE.md, settings, MCP, guard y skills",
+        plan: claude,
+    },
+    Module {
+        key: "pi",
+        desc: "Pi: SYSTEM.md, settings, extensiones y skills",
+        plan: pi,
+    },
+    Module {
+        key: "obsidian",
+        desc: "Sincroniza la bóveda con GitHub",
+        plan: obsidian,
+    },
+    Module {
+        key: "mise",
+        desc: "Herramientas globales con mise (claude, pi…)",
+        plan: mise,
+    },
+    Module {
+        key: "scripts",
+        desc: "Scripts propios y servidor LFM3 (llama.cpp)",
+        plan: scripts,
+    },
 ];
 
 const VSCODE_EXT: &str = ".vscode/extensions/thorstenrhau.token-vscode-themes-0.0.0";
@@ -314,7 +374,10 @@ fn skill_sources(dots: &Dots) -> Result<Vec<PathBuf>> {
 /// bóveda, con sus notas, se queda en `~/Documents/Obsidian`.
 fn obsidian(dots: &Dots) -> Result<Vec<Op>> {
     let mut ops = vec![
-        link(dots.repo("obsidian/sync.sh"), dots.home(".local/bin/obsidian-sync")),
+        link(
+            dots.repo("obsidian/sync.sh"),
+            dots.home(".local/bin/obsidian-sync"),
+        ),
         link_into(
             dots.repo("obsidian/obsidian-sync.service"),
             &dots.home(".config/systemd/user"),
@@ -404,7 +467,10 @@ fn remove(dest: PathBuf) -> Op {
 /// Un enlace que apunta dentro del repositorio, o que quedó colgado, lo puso
 /// este instalador. Cualquier otro destino es del usuario y no se toca.
 fn owned_link(dest: &Path, root: &Path) -> bool {
-    link::is_symlink(dest) && fs::canonicalize(dest).ok().is_none_or(|t| t.starts_with(root))
+    link::is_symlink(dest)
+        && fs::canonicalize(dest)
+            .ok()
+            .is_none_or(|t| t.starts_with(root))
 }
 
 fn dangling(dir: &Path) -> Vec<PathBuf> {
@@ -416,7 +482,10 @@ fn dangling(dir: &Path) -> Vec<PathBuf> {
 }
 
 fn dirs(parent: &Path) -> Result<Vec<PathBuf>> {
-    let mut found: Vec<PathBuf> = entries(parent)?.into_iter().filter(|p| p.is_dir()).collect();
+    let mut found: Vec<PathBuf> = entries(parent)?
+        .into_iter()
+        .filter(|p| p.is_dir())
+        .collect();
     found.sort();
 
     Ok(found)
@@ -425,7 +494,10 @@ fn dirs(parent: &Path) -> Result<Vec<PathBuf>> {
 fn entries(dir: &Path) -> Result<Vec<PathBuf>> {
     let read = fs::read_dir(dir).with_context(|| format!("no se pudo leer {}", dir.display()))?;
 
-    Ok(read.filter_map(|entry| entry.ok()).map(|e| e.path()).collect())
+    Ok(read
+        .filter_map(|entry| entry.ok())
+        .map(|e| e.path())
+        .collect())
 }
 
 fn name_of(path: &Path) -> Option<String> {
@@ -437,7 +509,9 @@ fn extension(path: &Path) -> &str {
 }
 
 fn file_name(path: &Path) -> &str {
-    path.file_name().and_then(|name| name.to_str()).unwrap_or("")
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("")
 }
 
 #[cfg(test)]
@@ -454,7 +528,11 @@ mod tests {
         fs::create_dir_all(dir.path().join("repo/pi/extensions/guard")).expect("extension");
         fs::write(skills.join("README.md"), "").expect("file");
 
-        let dots = Dots::at(dir.path().join("repo"), dir.path().join("home"), Some(Machine::Notebook));
+        let dots = Dots::at(
+            dir.path().join("repo"),
+            dir.path().join("home"),
+            Some(Machine::Notebook),
+        );
 
         (dir, dots)
     }
@@ -530,10 +608,7 @@ mod tests {
         assert!(hypr(&dots).is_err());
 
         dots.choose(Machine::Notebook);
-        assert_eq!(
-            monitors_of(&dots),
-            [PathBuf::from("hypr/monitors.lua")]
-        );
+        assert_eq!(monitors_of(&dots), [PathBuf::from("hypr/monitors.lua")]);
     }
 
     fn dests(ops: &[Op]) -> Vec<PathBuf> {
@@ -577,7 +652,11 @@ mod tests {
         let claude_dir = dots.home(".claude");
         fs::create_dir_all(claude_dir.join("skills")).expect("skills");
         unix::symlink(dots.repo("claude/CLAUDE.md"), claude_dir.join("CLAUDE.md")).expect("config");
-        unix::symlink(dots.repo("pi/skills/locality"), claude_dir.join("skills/locality")).expect("skill");
+        unix::symlink(
+            dots.repo("pi/skills/locality"),
+            claude_dir.join("skills/locality"),
+        )
+        .expect("skill");
 
         let ops = pi(&dots).expect("plan");
 
@@ -593,10 +672,16 @@ mod tests {
         let found = links(&claude(&dots).expect("plan"));
 
         for name in CLAUDE_CONFIG {
-            assert!(found.contains(&(dots.repo("claude").join(name), target.join(name))), "{name}");
+            assert!(
+                found.contains(&(dots.repo("claude").join(name), target.join(name))),
+                "{name}"
+            );
         }
         assert!(found.contains(&(dots.repo(GUARD_SCRIPT), dots.home(GUARD_HOOK))));
-        assert!(found.contains(&(dots.repo("pi/skills/locality"), target.join("skills/locality"))));
+        assert!(found.contains(&(
+            dots.repo("pi/skills/locality"),
+            target.join("skills/locality")
+        )));
     }
 
     #[test]
@@ -612,7 +697,11 @@ mod tests {
 
         assert!(found.contains(&(installed.join("show-me"), target.join("show-me"))));
         assert!(found.contains(&(dots.repo("pi/skills/locality"), target.join("locality"))));
-        assert!(!found.iter().any(|(_, dest)| *dest == target.join(".skill-lock.json")));
+        assert!(
+            !found
+                .iter()
+                .any(|(_, dest)| *dest == target.join(".skill-lock.json"))
+        );
     }
 
     #[test]
@@ -693,10 +782,26 @@ mod tests {
         fs::create_dir_all(&wants).expect("units");
         fs::create_dir_all(dots.home(".local/bin")).expect("bin");
         fs::write(dir.path().join("elsewhere"), "").expect("foreign target");
-        unix::symlink(dots.root().join("obsidian/autocommit.sh"), dots.home(".local/bin/obsidian-autocommit")).expect("owned");
-        unix::symlink(dots.root().join("obsidian/obsidian-autocommit.timer"), units.join("obsidian-autocommit.timer")).expect("owned");
-        unix::symlink(units.join("obsidian-autocommit.timer"), wants.join("obsidian-autocommit.timer")).expect("enabled");
-        unix::symlink(dir.path().join("elsewhere"), units.join("obsidian-autocommit.service")).expect("foreign");
+        unix::symlink(
+            dots.root().join("obsidian/autocommit.sh"),
+            dots.home(".local/bin/obsidian-autocommit"),
+        )
+        .expect("owned");
+        unix::symlink(
+            dots.root().join("obsidian/obsidian-autocommit.timer"),
+            units.join("obsidian-autocommit.timer"),
+        )
+        .expect("owned");
+        unix::symlink(
+            units.join("obsidian-autocommit.timer"),
+            wants.join("obsidian-autocommit.timer"),
+        )
+        .expect("enabled");
+        unix::symlink(
+            dir.path().join("elsewhere"),
+            units.join("obsidian-autocommit.service"),
+        )
+        .expect("foreign");
 
         let removed = removals(&obsidian(&dots).expect("plan"));
 

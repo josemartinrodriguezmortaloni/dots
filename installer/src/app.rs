@@ -5,8 +5,8 @@ use std::time::Duration;
 use anyhow::Result;
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 
+use crate::art::Art;
 use crate::catalog::MODULES;
-use crate::donut::Donut;
 use crate::dots::Dots;
 use crate::link::Backup;
 use crate::machine::Machine;
@@ -62,7 +62,7 @@ impl Run {
 
 pub struct App {
     pub screen: Screen,
-    pub donut: Donut,
+    pub art: Art,
     pub palette: Palette,
     pub picked: Vec<bool>,
     pub outcome: Option<Summary>,
@@ -75,7 +75,7 @@ impl App {
 
         Self {
             screen: first_screen(&dots),
-            donut: Donut::new(),
+            art: Art::new(),
             palette,
             picked: vec![true; MODULES.len()],
             outcome: None,
@@ -88,7 +88,7 @@ impl App {
     }
 
     pub fn step(&mut self) -> Result<()> {
-        self.donut.spin();
+        self.art.tick();
 
         let screen = std::mem::replace(&mut self.screen, Screen::Done);
         self.screen = self.advance(screen)?;

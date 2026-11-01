@@ -8,7 +8,7 @@ use crate::ops::Outcome;
 use crate::plan::{Plan, Step};
 
 /// Lo que el hilo de trabajo le cuenta al hilo de dibujo. El de dibujo nunca
-/// toca el filesystem, así que el donut sigue girando mientras se instala.
+/// toca el filesystem, así que el arte sigue animado mientras se instala.
 pub enum Progress {
     Started {
         index: usize,

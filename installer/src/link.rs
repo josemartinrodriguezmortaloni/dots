@@ -146,7 +146,10 @@ fn raise(flag: &Path) -> Result<()> {
 
 fn cursor_stalls() -> bool {
     sh::has_command("cursor")
-        && !sh::quiet("timeout", &[CURSOR_PROBE_SECONDS, "cursor", "--list-extensions"])
+        && !sh::quiet(
+            "timeout",
+            &[CURSOR_PROBE_SECONDS, "cursor", "--list-extensions"],
+        )
 }
 
 fn already_linked(src: &Path, dest: &Path) -> bool {

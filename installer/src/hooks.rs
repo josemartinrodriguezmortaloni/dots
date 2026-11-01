@@ -101,7 +101,10 @@ fn theme_name(home: &Path) -> Option<String> {
 /// `~/.local/share/mise/installs` no existen en un equipo nuevo.
 fn install_tools(_home: &Path) -> Vec<String> {
     if !sh::has_command("mise") {
-        return vec!["mise no está instalado: las herramientas de mise/config.toml quedan pendientes".to_owned()];
+        return vec![
+            "mise no está instalado: las herramientas de mise/config.toml quedan pendientes"
+                .to_owned(),
+        ];
     }
 
     match sh::quiet("mise", &["install"]) {
@@ -119,7 +122,10 @@ fn register_mcp(home: &Path) -> Vec<String> {
 
     match sh::quiet("bash", &[&script.to_string_lossy()]) {
         true => vec!["servidores MCP de Claude Code registrados".to_owned()],
-        false => vec![format!("{} falló: correlo a mano para ver el detalle", script.display())],
+        false => vec![format!(
+            "{} falló: correlo a mano para ver el detalle",
+            script.display()
+        )],
     }
 }
 

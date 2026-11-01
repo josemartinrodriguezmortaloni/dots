@@ -17,7 +17,10 @@ impl Machine {
 
     /// `None` si la variable no está exportada: el equipo queda por elegir.
     pub fn from_env() -> Result<Option<Self>> {
-        env::var("DOTS_MACHINE").ok().map(|value| Self::parse(&value)).transpose()
+        env::var("DOTS_MACHINE")
+            .ok()
+            .map(|value| Self::parse(&value))
+            .transpose()
     }
 
     fn parse(value: &str) -> Result<Self> {
@@ -50,8 +53,14 @@ mod tests {
 
     #[test]
     fn parse_accepts_both_machines() {
-        assert_eq!(Machine::parse("desktop").expect("desktop"), Machine::Desktop);
-        assert_eq!(Machine::parse("notebook").expect("notebook"), Machine::Notebook);
+        assert_eq!(
+            Machine::parse("desktop").expect("desktop"),
+            Machine::Desktop
+        );
+        assert_eq!(
+            Machine::parse("notebook").expect("notebook"),
+            Machine::Notebook
+        );
     }
 
     #[test]
