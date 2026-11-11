@@ -28,6 +28,10 @@ local function icon_highlight(ctx)
   return hl or ctx.kind_hl
 end
 
+-- No-op si la librería nativa ya existe; la recompila si un build anterior se
+-- interrumpió (PackChanged no vuelve a disparar hasta el próximo update).
+require("blink.cmp").build():wait()
+
 require("blink.cmp").setup({
   -- 'super-tab' for mappings similar to vscode (tab to accept)
   -- See :h blink-cmp-config-keymap for defining your own keymap
@@ -73,6 +77,6 @@ require("blink.cmp").setup({
 
   sources = { default = { "lsp", "path", "snippets", "buffer" } },
 
-  -- Rust fuzzy matcher; el binario lo compila el build de init.lua
+  -- Rust fuzzy matcher; el binario lo compila el build de init.lua o el de arriba
   fuzzy = { implementation = "rust" },
 })
