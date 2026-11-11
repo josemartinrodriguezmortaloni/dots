@@ -1,5 +1,10 @@
 {
   "syncClaudeAiPlugins": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(bat *)",
@@ -74,20 +79,15 @@
     }
   },
   "effortLevel": "high",
-  "tui": "fullscreen",
-  "theme": "custom:omarchy",
-  "autoCompactEnabled": true,
-  "terminalProgressBarEnabled": true,
-  "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
   "modelSettings": {
     "claude-opus-5-5": {
       "autoCompactWindow": 400000
     }
   },
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  "includeCoAuthoredBy": false
+  "tui": "fullscreen",
+  "theme": "custom:omarchy",
+  "autoCompactEnabled": true,
+  "terminalProgressBarEnabled": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }

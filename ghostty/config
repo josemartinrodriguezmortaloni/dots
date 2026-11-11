@@ -2,8 +2,8 @@
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 
 # Font
-font-family = "'Droid Sans Mono', 'monospace', monospace"
-font-size = 13
+font-family = "Hack Nerd Font"
+font-size = 15
 
 # Window
 window-theme = ghostty
